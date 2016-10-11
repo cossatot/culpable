@@ -2,10 +2,10 @@ import numpy as np
 from scipy.interpolate import interp1d
 from scipy.integrate import trapz, cumtrapz
 
-
+# basic pdf stuff
 def make_pdf(vals, probs, n_interp=1000):
     """
-    Takes a sequence of 
+    Takes a sequence of x (values) and p(x) (probs) and makes a PDF
     """
     
     
@@ -32,6 +32,11 @@ def make_cdf(pdf_range, pdf_probs):
     return (pdf_range, np.cumsum(pdf_probs))
 
 
+def pdf_mean(pdf_vals, pdf_probs):
+    return trapz(pdf_vals * pdf_probs, pdf_vals)
+
+
+# sampling
 def inverse_transform_sample(vals, probs, n_samps, n_interp=1000):
     """
     
@@ -50,6 +55,40 @@ def inverse_transform_sample(vals, probs, n_samps, n_interp=1000):
         return cdf_interp(samps)
 
 
-def pdf_mean(pdf_vals, pdf_probs):
-    return trapz(pdf_vals * pdf_probs, pdf_vals)
+def sample_from_bounded_normal(mean, sd, n, sample_min=None, sample_max=None):
+
+    sample = np.random.normal(mean, sd, n)
+    sample = trim_distribution(sample, sample_min=sample_min, 
+                                       sample_max=sample_max)
+
+    while len(sample) < n:
+        next_sample = np.random.normal(mean, sd, n)
+        next_sample = trim_distribution(next_sample, sample_min, sample_max)
+        sample = np.hstack([sample, next_sample])
+
+    return sample[:n]
+
+
+def trim_distribution(sample, sample_min=None, sample_max=None):
+
+    if sample_min is not None and sample_max is not None:
+        if sample_min >= sample_max:
+            raise Exception('min must be less than max!')
+
+    if sample_min is not None:
+        sample = sample[sample >= sample_min]
+
+    if sample_max is not None:
+        sample = sample[sample <= sample_max]
+
+    return sample
+
+
+def check_monot_increasing(in_array):
+    """Checks to see if array is monotonically increasing, returns bool value
+    """
+    dx = np.diff(in_array)
+
+    return np.all(dx >= 0)
+
 

@@ -6,12 +6,11 @@ from attr.validators import instance_of, optional
 
 from .stats import inverse_transform_sample, sample_from_bounded_normal
 
-
 def validate_offset_units(instance, offset_units, value):
     '''
     Validator for `offset_units` attribute in `OffsetMarker` class
     '''
-    acceptable_offset_units = ['y', 'ky', 'My']
+    acceptable_offset_units = ['mm', 'm', 'km']
     if not value in acceptable_offset_units:
         raise ValueError(
             "{} not acceptable unit; only {}".format(value,
@@ -71,10 +70,13 @@ class OffsetMarker(object):
     offset_min = attr.ib(default=None, validator=optional(instance_of(float)))
     offset_max = attr.ib(default=None, validator=optional(instance_of(float)))
     
-    offset_vals = attr.ib(default=attr.Factory(np.array), convert=np.array,
-                          validator=instance_of(np.array))
-    offset_probs = attr.ib(default=attr.Factory(np.array), convert=np.array,
-                           validator=instance_of(np.array))
+    offset_vals = attr.ib(default=attr.Factory(list), #convert=np.array,
+                          #validator=instance_of(np.array)
+                          )
+    offset_probs = attr.ib(default=attr.Factory(list), 
+                           #convert=np.array,
+                           #validator=instance_of(np.array)
+                           )
 
     # Age parameters
     age_units = attr.ib(default='ky', validator=validate_age_units)
@@ -88,28 +90,133 @@ class OffsetMarker(object):
     age_min = attr.ib(default=None, validator=optional(instance_of(float)))
     age_max = attr.ib(default=None, validator=optional(instance_of(float)))
     
-    age_vals = attr.ib(default=attr.Factory(np.array), convert=np.array,
-                        validator=instance_of(np.array))
-    age_probs = attr.ib(default=attr.Factory(np.array), convert=np.array,
-                         validator=instance_of(np.array))
+    age_vals = attr.ib(default=attr.Factory(list), 
+                       #convert=np.array,
+                       #validator=instance_of(np.array)
+                       )
+    age_probs = attr.ib(default=attr.Factory(list), 
+                        #convert=np.array,
+                        #validator=instance_of(np.array)
+                        )
+
+    # Dip parameters
+    dip_dist_type = attr.ib(default='unspecified', 
+                            validator=None#validate_dip_dist_type)
+                            )
+
+    dip_mean = attr.ib(default=None, validator=optional(instance_of(float)))
+    dip_median= attr.ib(default=None,validator=optional(instance_of(float)))
+    dip_sd = attr.ib(default=None, validator=optional(instance_of(float)))
+    dip_mad = attr.ib(default=None, validator=optional(instance_of(float)))
+    dip_min = attr.ib(default=None, validator=optional(instance_of(float)))
+    dip_max = attr.ib(default=None, validator=optional(instance_of(float)))
+    
+    dip_vals = attr.ib(default=attr.Factory(list), #convert=np.array,
+                          #validator=instance_of(np.array)
+                          )
+    dip_probs = attr.ib(default=attr.Factory(list), 
+                           #convert=np.array,
+                           #validator=instance_of(np.array)
+                           )
+
+    # Strike parameters
+    strike_dist_type = attr.ib(default='unspecified', 
+                               validator=None#validate_strike_dist_type)
+                               )
+
+    strike_mean = attr.ib(default=None, validator=optional(instance_of(float)))
+    strike_median= attr.ib(default=None,validator=optional(instance_of(float)))
+    strike_sd = attr.ib(default=None, validator=optional(instance_of(float)))
+    strike_mad = attr.ib(default=None, validator=optional(instance_of(float)))
+    strike_min = attr.ib(default=None, validator=optional(instance_of(float)))
+    strike_max = attr.ib(default=None, validator=optional(instance_of(float)))
+    
+    strike_vals = attr.ib(default=attr.Factory(list), #convert=np.array,
+                          #validator=instance_of(np.array)
+                          )
+    strike_probs = attr.ib(default=attr.Factory(list), 
+                           #convert=np.array,
+                           #validator=instance_of(np.array)
+                           )
+
+    # Rake parameters
+    rake_dist_type = attr.ib(default='unspecified', 
+                             #validator=validate_rake_dist_type)
+                             )
+
+    rake_mean = attr.ib(default=None, validator=optional(instance_of(float)))
+    rake_median= attr.ib(default=None,validator=optional(instance_of(float)))
+    rake_sd = attr.ib(default=None, validator=optional(instance_of(float)))
+    rake_mad = attr.ib(default=None, validator=optional(instance_of(float)))
+    rake_min = attr.ib(default=None, validator=optional(instance_of(float)))
+    rake_max = attr.ib(default=None, validator=optional(instance_of(float)))
+    
+    rake_vals = attr.ib(default=attr.Factory(list), #convert=np.array,
+                          #validator=instance_of(np.array)
+                          )
+    rake_probs = attr.ib(default=attr.Factory(list), 
+                           #convert=np.array,
+                           #validator=instance_of(np.array)
+                           )
+
+    # Heave parameters
+    heave_units = attr.ib(default='m', validator=validate_heave_units)
+    heave_dist_type = attr.ib(default='unspecified', 
+                              #validator=validate_heave_dist_type)
+                              )
+
+    heave_mean = attr.ib(default=None, validator=optional(instance_of(float)))
+    heave_median= attr.ib(default=None,validator=optional(instance_of(float)))
+    heave_sd = attr.ib(default=None, validator=optional(instance_of(float)))
+    heave_mad = attr.ib(default=None, validator=optional(instance_of(float)))
+    heave_min = attr.ib(default=None, validator=optional(instance_of(float)))
+    heave_max = attr.ib(default=None, validator=optional(instance_of(float)))
+    
+    heave_vals = attr.ib(default=attr.Factory(list), #convert=np.array,
+                          #validator=instance_of(np.array)
+                          )
+    heave_probs = attr.ib(default=attr.Factory(list), 
+                           #convert=np.array,
+                           #validator=instance_of(np.array)
+                           )
+
+    # Throw parameters
+    throw_dist_type = attr.ib(default='unspecified', 
+                              #validator=validate_throw_dist_type)
+                              )
+
+    throw_mean = attr.ib(default=None, validator=optional(instance_of(float)))
+    throw_median= attr.ib(default=None,validator=optional(instance_of(float)))
+    throw_sd = attr.ib(default=None, validator=optional(instance_of(float)))
+    throw_mad = attr.ib(default=None, validator=optional(instance_of(float)))
+    throw_min = attr.ib(default=None, validator=optional(instance_of(float)))
+    throw_max = attr.ib(default=None, validator=optional(instance_of(float)))
+    
+    throw_vals = attr.ib(default=attr.Factory(list), #convert=np.array,
+                          #validator=instance_of(np.array)
+                          )
+    throw_probs = attr.ib(default=attr.Factory(list), 
+                           #convert=np.array,
+                           #validator=instance_of(np.array)
+                           )
 
 
     def check_age_dist_type(self):
         if self.age_dist_type == 'unspecified':
-            if age_mean is not None and age_sd is not None:
+            if self.age_mean is not None and self.age_sd is not None:
                 self.age_dist_type = 'normal'
-            elif (age_min is not None and age_max is not None
-                  and age_sd == None):
+            elif (self.age_min is not None and self.age_max is not None
+                  and self.age_sd == None):
                 self.age_dist_type = 'uniform'
-            elif age_probs is not None and age_vals is not None:
+            elif self.age_probs is not None and self.age_vals is not None:
                 self.age_dist_type = 'arbitrary'
 
     def check_offset_dist_type(self):
-        if self.age_dist_type == 'unspecified':
-            if offset_mean is not None and offset_sd is not None:
+        if self.offset_dist_type == 'unspecified':
+            if self.offset_mean is not None and self.offset_sd is not None:
                 self.offset_dist_type = 'normal'
-            elif (offset_min is not None and offset_max is not None
-                  and offset_sd == None):
+            elif (self.offset_min is not None and self.offset_max is not None
+                  and self.offset_sd == None):
                 self.offset_dist_type = 'uniform'
             elif offset_probs is not None and offset_vals is not None:
                 self.offset_dist_type = 'arbitrary'
@@ -139,7 +246,7 @@ class OffsetMarker(object):
     def sample_offset(self, n):
         """Generates n-length array of samples from distribution"""
 
-        check_offset_dist_type()
+        self.check_offset_dist_type()
 
         if self.offset_dist_type == 'normal':
             offset_sample = self.sample_offset_from_normal(n)
@@ -174,7 +281,8 @@ class OffsetMarker(object):
 
     def sample_age(self, n):
         """Generates n-length array of samples from distribution"""
-        check_age_dist_type()
+
+        self.check_age_dist_type()
 
         if self.age_dist_type == 'normal':
             age_sample = self.sample_age_from_normal(n)
