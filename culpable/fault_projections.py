@@ -23,12 +23,12 @@ def hor_sep_from_offset(offset, dip, rake=90.):
     return hor_sep_from_dip_slip(dip_slip, dip, rake)
 
 
-def offset_from_strike_sep(strike_slip, dip, rake=0.):
+def offset_from_strike_slip(strike_slip, dip, rake=0.):
     return strike_slip / cos( radians(rake))
 
 
 def strike_slip_from_offset(offset, dip, rake=0.):
-    return strike_slip * cos( radians(rake))
+    return offset * cos( radians(rake))
 
 
 def offset_from_dip_slip(dip_slip, dip, rake=90.):
@@ -44,7 +44,7 @@ def heave_from_offset(offset, dip, rake=90.):
     return offset * cos( radians(apparent_dip))
 
 
-def offset_from_heave(offset, dip, rake=90.):
+def offset_from_heave(heave, dip, rake=90.):
     apparent_dip = apparent_dip_from_dip_rake(dip, rake)
     return heave / cos( radians(apparent_dip))
 

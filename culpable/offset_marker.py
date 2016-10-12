@@ -1,10 +1,10 @@
 import numpy as np
 
-
 import attr
 from attr.validators import instance_of, optional
 
 from .stats import inverse_transform_sample, sample_from_bounded_normal
+from .fault_projections import *
 
 def validate_offset_units(instance, offset_units, value):
     '''
@@ -159,46 +159,62 @@ class OffsetMarker(object):
                            #validator=instance_of(np.array)
                            )
 
-    # Heave parameters
-    heave_units = attr.ib(default='m', validator=validate_heave_units)
-    heave_dist_type = attr.ib(default='unspecified', 
-                              #validator=validate_heave_dist_type)
+    # Horizontal separation parameters
+    hor_separation_units = attr.ib(default='m', 
+                                   #validator=validate_hor_separation_units)
+                                   )
+    hor_separation_dist_type = attr.ib(default='unspecified', 
+                              #validator=validate_hor_separation_dist_type)
                               )
 
-    heave_mean = attr.ib(default=None, validator=optional(instance_of(float)))
-    heave_median= attr.ib(default=None,validator=optional(instance_of(float)))
-    heave_sd = attr.ib(default=None, validator=optional(instance_of(float)))
-    heave_mad = attr.ib(default=None, validator=optional(instance_of(float)))
-    heave_min = attr.ib(default=None, validator=optional(instance_of(float)))
-    heave_max = attr.ib(default=None, validator=optional(instance_of(float)))
+    hor_separation_mean = attr.ib(default=None,
+                                  validator=optional(instance_of(float)))
+    hor_separation_median= attr.ib(default=None,
+                                   validator=optional(instance_of(float)))
+    hor_separation_sd = attr.ib(default=None,
+                                validator=optional(instance_of(float)))
+    hor_separation_mad = attr.ib(default=None,
+                                 validator=optional(instance_of(float)))
+    hor_separation_min = attr.ib(default=None,
+                                 validator=optional(instance_of(float)))
+    hor_separation_max = attr.ib(default=None,
+                                 validator=optional(instance_of(float)))
     
-    heave_vals = attr.ib(default=attr.Factory(list), #convert=np.array,
-                          #validator=instance_of(np.array)
-                          )
-    heave_probs = attr.ib(default=attr.Factory(list), 
-                           #convert=np.array,
-                           #validator=instance_of(np.array)
-                           )
+    hor_separation_vals = attr.ib(default=attr.Factory(list),
+                                  #convert=np.array,
+                                  #validator=instance_of(np.array)
+                                  )
+    hor_separation_probs = attr.ib(default=attr.Factory(list), 
+                                   #convert=np.array,
+                                   #validator=instance_of(np.array)
+                                   )
 
     # Throw parameters
-    throw_dist_type = attr.ib(default='unspecified', 
-                              #validator=validate_throw_dist_type)
+    vert_separation_dist_type = attr.ib(default='unspecified', 
+                              #validator=validate_vert_separation_dist_type)
                               )
 
-    throw_mean = attr.ib(default=None, validator=optional(instance_of(float)))
-    throw_median= attr.ib(default=None,validator=optional(instance_of(float)))
-    throw_sd = attr.ib(default=None, validator=optional(instance_of(float)))
-    throw_mad = attr.ib(default=None, validator=optional(instance_of(float)))
-    throw_min = attr.ib(default=None, validator=optional(instance_of(float)))
-    throw_max = attr.ib(default=None, validator=optional(instance_of(float)))
+    vert_separation_mean = attr.ib(default=None, 
+                                   validator=optional(instance_of(float)))
+    vert_separation_median= attr.ib(default=None,
+                                    validator=optional(instance_of(float)))
+    vert_separation_sd = attr.ib(default=None,
+                                 validator=optional(instance_of(float)))
+    vert_separation_mad = attr.ib(default=None,
+                                  validator=optional(instance_of(float)))
+    vert_separation_min = attr.ib(default=None,
+                                  validator=optional(instance_of(float)))
+    vert_separation_max = attr.ib(default=None,
+                                  validator=optional(instance_of(float)))
     
-    throw_vals = attr.ib(default=attr.Factory(list), #convert=np.array,
-                          #validator=instance_of(np.array)
-                          )
-    throw_probs = attr.ib(default=attr.Factory(list), 
-                           #convert=np.array,
-                           #validator=instance_of(np.array)
-                           )
+    vert_separation_vals = attr.ib(default=attr.Factory(list), 
+                                   #convert=np.array,
+                                   #validator=instance_of(np.array)
+                                   )
+    vert_separation_probs = attr.ib(default=attr.Factory(list), 
+                                    #convert=np.array,
+                                    #validator=instance_of(np.array)
+                                    )
 
 
     def check_age_dist_type(self):
