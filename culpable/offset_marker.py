@@ -502,3 +502,11 @@ class OffsetMarker(object):
             offset_sample = offset_sample[0:asl]
         
         return age_sample, offset_sample
+
+    # IO
+    def to_dict(self, exclude=(None, 'unspecified', [])):
+        out_dict = attr.asdict(self)
+
+        out_dict = {k:v for k, v in out_dict.items() if v not in exclude}
+
+        return out_dict
