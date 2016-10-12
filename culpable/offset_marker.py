@@ -6,7 +6,19 @@ from attr.validators import instance_of, optional
 from .stats import inverse_transform_sample, sample_from_bounded_normal
 from .fault_projections import *
 
-def validate_offset_units(instance, offset_units, value):
+
+def validate_time_units(instance, time_units, value):
+    '''
+    Validator for `age_units` attribute in `OffsetMarker` class
+    '''
+    acceptable_time_units = ['y', 'cal_yr', 'ky', 'My']
+    if not value in acceptable_time_units:
+        raise ValueError(
+            "{} not acceptable unit; only {}".format(value,
+                                                     acceptable_time_units))
+
+
+def validate_distance_units(instance, distance_units, value):
     '''
     Validator for `offset_units` attribute in `OffsetMarker` class
     '''
@@ -17,33 +29,12 @@ def validate_offset_units(instance, offset_units, value):
                                                      acceptable_offset_units))
 
 
-def validate_age_units(instance, age_units, value):
-    '''
-    Validator for `age_units` attribute in `OffsetMarker` class
-    '''
-    acceptable_age_units = ['y', 'cal_yr', 'ky', 'My']
-    if not value in acceptable_age_units:
-        raise ValueError(
-            "{} not acceptable unit; only {}".format(value,
-                                                     acceptable_age_units))
-
-
 acceptable_distribution_types = ['unspecified', 'normal', 'laplacian',
-                                 'uniform', 'arbitrary']
+                                 'uniform', 'arbitrary', 'scalar']
 
-def validate_age_dist_type(instance, age_dist_type, value):
+def validate_dist_type(instance, age_dist_type, value):
     '''
     Validator for `age_units` attribute in `OffsetMarker` class
-    '''
-    if not value in acceptable_distribution_types:
-        raise ValueError(
-            "{} not acceptable unit; only {}".format(value,
-                                               acceptable_distribution_types))
-
-
-def validate_offset_dist_type(instance, offset_dist_type, value):
-    '''
-    Validator for `offset_units` attribute in `OffsetMarker` class
     '''
     if not value in acceptable_distribution_types:
         raise ValueError(
@@ -56,12 +47,12 @@ class OffsetMarker(object):
     
     source = attr.ib(default=None)
     metadata = attr.ib(default=None)
-    name = attr.ib(default=None, validator=instance_of(str))
+    name = attr.ib(default=None, validator=optional(instance_of(str)))
 
     # Offset parameters
-    offset_units = attr.ib(default='m', validator=validate_offset_units)
+    offset_units = attr.ib(default='m', validator=validate_distance_units)
     offset_dist_type = attr.ib(default='unspecified', 
-                               validator=validate_offset_dist_type)
+                               validator=validate_dist_type)
 
     offset_mean = attr.ib(default=None, validator=optional(instance_of(float)))
     offset_median= attr.ib(default=None,validator=optional(instance_of(float)))
@@ -79,9 +70,9 @@ class OffsetMarker(object):
                            )
 
     # Age parameters
-    age_units = attr.ib(default='ky', validator=validate_age_units)
+    age_units = attr.ib(default='ky', validator=validate_time_units)
     age_dist_type = attr.ib(default='unspecified', 
-                             validator=validate_age_dist_type)
+                             validator=validate_dist_type)
 
     age_mean = attr.ib(default=None, validator=optional(instance_of(float)))
     age_median = attr.ib(default=None,validator=optional(instance_of(float)))
@@ -101,8 +92,7 @@ class OffsetMarker(object):
 
     # Dip parameters
     dip_dist_type = attr.ib(default='unspecified', 
-                            validator=None#validate_dip_dist_type)
-                            )
+                            validator=validate_dist_type)
 
     dip_mean = attr.ib(default=None, validator=optional(instance_of(float)))
     dip_median= attr.ib(default=None,validator=optional(instance_of(float)))
@@ -121,8 +111,7 @@ class OffsetMarker(object):
 
     # Strike parameters
     strike_dist_type = attr.ib(default='unspecified', 
-                               validator=None#validate_strike_dist_type)
-                               )
+                               validator=validate_dist_type)
 
     strike_mean = attr.ib(default=None, validator=optional(instance_of(float)))
     strike_median= attr.ib(default=None,validator=optional(instance_of(float)))
@@ -141,8 +130,8 @@ class OffsetMarker(object):
 
     # Rake parameters
     rake_dist_type = attr.ib(default='unspecified', 
-                             #validator=validate_rake_dist_type)
-                             )
+                             validator=validate_dist_type)
+                             
 
     rake_mean = attr.ib(default=None, validator=optional(instance_of(float)))
     rake_median= attr.ib(default=None,validator=optional(instance_of(float)))
@@ -161,11 +150,10 @@ class OffsetMarker(object):
 
     # Horizontal separation parameters
     hor_separation_units = attr.ib(default='m', 
-                                   #validator=validate_hor_separation_units)
-                                   )
+                                   validator=validate_distance_units)
+                                   
     hor_separation_dist_type = attr.ib(default='unspecified', 
-                              #validator=validate_hor_separation_dist_type)
-                              )
+                                       validator=validate_dist_type)
 
     hor_separation_mean = attr.ib(default=None,
                                   validator=optional(instance_of(float)))
@@ -190,9 +178,11 @@ class OffsetMarker(object):
                                    )
 
     # Throw parameters
+    vert_separation_units = attr.ib(default='m', 
+                                    validator=validate_distance_units)
+                                   
     vert_separation_dist_type = attr.ib(default='unspecified', 
-                              #validator=validate_vert_separation_dist_type)
-                              )
+                                        validator=validate_dist_type)
 
     vert_separation_mean = attr.ib(default=None, 
                                    validator=optional(instance_of(float)))
@@ -217,6 +207,78 @@ class OffsetMarker(object):
                                     )
 
 
+    # Strike-slip parameters
+    strike_slip_units = attr.ib(default='m', validator=validate_distance_units)
+    strike_slip_dist_type = attr.ib(default='unspecified', 
+                                    validator=validate_dist_type)
+
+    strike_slip_mean = attr.ib(default=None, 
+                               validator=optional(instance_of(float)))
+    strike_slip_median= attr.ib(default=None,
+                                validator=optional(instance_of(float)))
+    strike_slip_sd = attr.ib(default=None, 
+                             validator=optional(instance_of(float)))
+    strike_slip_mad = attr.ib(default=None, 
+                              validator=optional(instance_of(float)))
+    strike_slip_min = attr.ib(default=None, 
+                              validator=optional(instance_of(float)))
+    strike_slip_max = attr.ib(default=None, 
+                              validator=optional(instance_of(float)))
+    
+    strike_slip_vals = attr.ib(default=attr.Factory(list), #convert=np.array,
+                          #validator=instance_of(np.array)
+                          )
+    strike_slip_probs = attr.ib(default=attr.Factory(list), 
+                           #convert=np.array,
+                           #validator=instance_of(np.array)
+                           )
+
+    # Dip-slip parameters
+    dip_slip_units = attr.ib(default='m', validator=validate_distance_units)
+    dip_slip_dist_type = attr.ib(default='unspecified', 
+                                 validator=validate_dist_type)
+
+    dip_slip_mean = attr.ib(default=None, 
+                            validator=optional(instance_of(float)))
+    dip_slip_median= attr.ib(default=None,
+                             validator=optional(instance_of(float)))
+    dip_slip_sd = attr.ib(default=None, 
+                          validator=optional(instance_of(float)))
+    dip_slip_mad = attr.ib(default=None, 
+                           validator=optional(instance_of(float)))
+    dip_slip_min = attr.ib(default=None, 
+                           validator=optional(instance_of(float)))
+    dip_slip_max = attr.ib(default=None, 
+                           validator=optional(instance_of(float)))
+    
+    dip_slip_vals = attr.ib(default=attr.Factory(list), #convert=np.array,
+                          #validator=instance_of(np.array)
+                          )
+    dip_slip_probs = attr.ib(default=attr.Factory(list), 
+                           #convert=np.array,
+                           #validator=instance_of(np.array)
+                           )
+
+    # Heave parameters
+    heave_units = attr.ib(default='m', validator=validate_distance_units)
+    heave_dist_type = attr.ib(default='unspecified', 
+                               validator=validate_dist_type)
+
+    heave_mean = attr.ib(default=None, validator=optional(instance_of(float)))
+    heave_median= attr.ib(default=None,validator=optional(instance_of(float)))
+    heave_sd = attr.ib(default=None, validator=optional(instance_of(float)))
+    heave_mad = attr.ib(default=None, validator=optional(instance_of(float)))
+    heave_min = attr.ib(default=None, validator=optional(instance_of(float)))
+    heave_max = attr.ib(default=None, validator=optional(instance_of(float)))
+    
+    heave_vals = attr.ib(default=attr.Factory(list), #convert=np.array,
+                          #validator=instance_of(np.array)
+                          )
+    heave_probs = attr.ib(default=attr.Factory(list), 
+                           #convert=np.array,
+                           #validator=instance_of(np.array)
+                           )
+
     def check_age_dist_type(self):
         if self.age_dist_type == 'unspecified':
             if self.age_mean is not None and self.age_sd is not None:
@@ -236,10 +298,171 @@ class OffsetMarker(object):
                 self.offset_dist_type = 'uniform'
             elif offset_probs is not None and offset_vals is not None:
                 self.offset_dist_type = 'arbitrary'
+            #TODO: add some check for 'scalar'
+
+    #TODO: check dist type of all offsets entered
 
     def check_dist_types(self):
         check_age_dist_type()
         check_offset_dist_type()
+
+
+    def check_offset_consistency(self):
+        pass
+
+    def fill_all_offsets(self):
+        '''
+        Fills values for all offsets given dip, rake, and any offset type
+        provided.
+        '''
+        # scalar only, right now
+        pass
+
+    def _find_entered_slip_val(self):
+        
+        comp_dict = {'offset_mean' :           self.offset_mean,      
+                     'offset_max' :            self.offset_max,       
+                     'hor_separation_mean' :   self.hor_separation_mean,     
+                     'hor_separation_max' :    self.hor_separation_max,      
+                     'vert_separation_mean':   self.vert_separation_mean,    
+                     'vert_separation_max' :   self.vert_separation_max,     
+                     'dip_slip_mean' :         self.dip_slip_mean,    
+                     'dip_slip_max' :          self.dip_slip_max,     
+                     'strike_slip_mean' :      self.strike_slip_mean, 
+                     'strike_slip_max' :       self.strike_slip_max,  
+                     'heave_mean' :            self.heave_mean,       
+                     'heave_max' :             self.heave_max,        
+                     'offset_median' :         self.offset_median,     
+                     'offset_probs' :          self.offset_probs,      
+                     'hor_separation_median' : self.hor_separation_median,     
+                     'hor_separation_probs' :  self.hor_separation_probs,      
+                     'vert_separation_median': self.vert_separation_median,    
+                     'vert_separation_probs' : self.vert_separation_probs,     
+                     'dip_slip_median' :       self.dip_slip_median,   
+                     'dip_slip_probs' :        self.dip_slip_probs,    
+                     'strike_slip_median' :    self.strike_slip_median,  
+                     'strike_slip_probs' :     self.strike_slip_probs, 
+                     'heave_median' :          self.heave_median,      
+                     'heave_probs' :           self.heave_probs
+                     }
+
+        return {k: v for k, v in comp_dict.items() if v not in ([], None)}
+   
+
+    def propagate_scalar_slip_components(self):
+        comp, comp_val = list(self._find_entered_slip_val())
+
+        if comp == 'offset_mean':
+            slip_comps = slip_comps_from_offset(comp_val, self.dip_mean,
+                                                self.rake_mean)
+            self.hor_separation_mean = slip_comps['hor_sep']
+            self.vert_separation_mean = slip_comps['vert_sep']
+            self.dip_slip_mean = slip_comps['dip_slip']
+            self.strike_slip_mean = slip_comps['strike_slip']
+            self.heave_mean = slip_comps['heave']
+
+        elif comp == 'offset_median':
+            slip_comps = slip_comps_from_offset(comp_val, self.dip_median,
+                                                self.rake_median)
+            self.hor_separation_median = slip_comps['hor_sep']
+            self.vert_separation_median = slip_comps['vert_sep']
+            self.dip_slip_median = slip_comps['dip_slip']
+            self.strike_slip_median = slip_comps['strike_slip']
+            self.heave_median = slip_comps['heave']
+
+        elif comp == 'hor_separation_mean':
+            slip_comps = slip_comps_from_hor_separation(comp_val, 
+                                                        self.dip_mean,
+                                                        self.rake_mean)
+            self.offset_mean = slip_comps['offset']
+            self.vert_separation_mean = slip_comps['vert_sep']
+            self.dip_slip_mean = slip_comps['dip_slip']
+            self.strike_slip_mean = slip_comps['strike_slip']
+            self.heave_mean = slip_comps['heave']
+
+        elif comp == 'hor_separation_median':
+            slip_comps = slip_comps_from_hor_separation(comp_val, 
+                                                        self.dip_median,
+                                                        self.rake_median)
+            self.offset_median = slip_comps['offset']
+            self.vert_separation_median = slip_comps['vert_sep']
+            self.dip_slip_median = slip_comps['dip_slip']
+            self.strike_slip_median = slip_comps['strike_slip']
+            self.heave_median = slip_comps['heave']
+
+        elif comp == 'vert_separation_mean':
+            slip_comps = slip_comps_from_vert_separation(comp_val, 
+                                                         self.dip_mean,
+                                                         self.rake_mean)
+            self.hor_separation_mean = slip_comps['hor_sep']
+            self.offset_mean = slip_comps['offset']
+            self.dip_slip_mean = slip_comps['dip_slip']
+            self.strike_slip_mean = slip_comps['strike_slip']
+            self.heave_mean = slip_comps['heave']
+
+        elif comp == 'vert_separation_median':
+            slip_comps = slip_comps_from_vert_separation(comp_val, 
+                                                         self.dip_median,
+                                                         self.rake_median)
+            self.hor_separation_median = slip_comps['hor_sep']
+            self.offset_median = slip_comps['offset']
+            self.dip_slip_median = slip_comps['dip_slip']
+            self.strike_slip_median = slip_comps['strike_slip']
+            self.heave_median = slip_comps['heave']
+
+        elif comp == 'strike_slip_mean':
+            slip_comps = slip_comps_from_strike_slip(comp_val, self.dip_mean,
+                                                     self.rake_mean)
+            self.hor_separation_mean = slip_comps['hor_sep']
+            self.vert_separation_mean = slip_comps['vert_sep']
+            self.dip_slip_mean = slip_comps['dip_slip']
+            self.offset_mean = slip_comps['offset']
+            self.heave_mean = slip_comps['heave']
+
+        elif comp == 'strike_slip_median':
+            slip_comps = slip_comps_from_strike_slip(comp_val, self.dip_median,
+                                                     self.rake_median)
+            self.hor_separation_median = slip_comps['hor_sep']
+            self.vert_separation_median = slip_comps['vert_sep']
+            self.dip_slip_median = slip_comps['dip_slip']
+            self.offset_median = slip_comps['offset']
+            self.heave_median = slip_comps['heave']
+
+        elif comp == 'dip_slip_mean':
+            slip_comps = slip_comps_from_dip_slip(comp_val, self.dip_mean,
+                                                  self.rake_mean)
+            self.hor_separation_mean = slip_comps['hor_sep']
+            self.vert_separation_mean = slip_comps['vert_sep']
+            self.offset_mean = slip_comps['offset']
+            self.strike_slip_mean = slip_comps['strike_slip']
+            self.heave_mean = slip_comps['heave']
+
+        elif comp == 'dip_slip_median':
+            slip_comps = slip_comps_from_dip_slip(comp_val, self.dip_median,
+                                                  self.rake_median)
+            self.hor_separation_median = slip_comps['hor_sep']
+            self.vert_separation_median = slip_comps['vert_sep']
+            self.offset_median = slip_comps['offset']
+            self.strike_slip_median = slip_comps['strike_slip']
+            self.heave_median = slip_comps['heave']
+
+        elif comp == 'heave_mean':
+            slip_comps = slip_comps_from_heave(comp_val, self.dip_mean,
+                                                self.rake_mean)
+            self.hor_separation_mean = slip_comps['hor_sep']
+            self.vert_separation_mean = slip_comps['vert_sep']
+            self.dip_slip_mean = slip_comps['dip_slip']
+            self.strike_slip_mean = slip_comps['strike_slip']
+            self.offset_mean = slip_comps['offset']
+
+        elif comp == 'heave_median':
+            slip_comps = slip_comps_from_heave(comp_val, self.dip_median,
+                                                self.rake_median)
+            self.hor_separation_median = slip_comps['hor_sep']
+            self.vert_separation_median = slip_comps['vert_sep']
+            self.dip_slip_median = slip_comps['dip_slip']
+            self.strike_slip_median = slip_comps['strike_slip']
+            self.offset_median = slip_comps['offset']
 
     # sampling
     def sample_offset_from_normal(self, n):
