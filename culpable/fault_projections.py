@@ -160,7 +160,7 @@ def strike_slip_from_heave(heave, dip, rake=0.):
 
 # aggregator functions
 def slip_components_from_offset(offset, dip, rake):
-    slip_comps = {}
+    slip_comps = {'offset' : offset}
 
     slip_comps['hor_sep'] = hor_sep_from_offset(offset, dip, rake)
     slip_comps['vert_sep'] = vert_sep_from_offset(offset, dip, rake)
@@ -172,7 +172,7 @@ def slip_components_from_offset(offset, dip, rake):
 
 
 def slip_components_from_hor_sep(hor_sep, dip, rake):
-    slip_comps = {}
+    slip_comps = {'hor_sep' : hor_sep}
 
     slip_comps['offset'] = offset_from_hor_sep(hor_sep, dip, rake)
     slip_comps['vert_sep'] = vert_sep_from_hor_sep(hor_sep, dip, rake)
@@ -184,7 +184,7 @@ def slip_components_from_hor_sep(hor_sep, dip, rake):
 
 
 def slip_components_from_vert_sep(vert_sep, dip, rake):
-    slip_comps = {}
+    slip_comps = {'vert_sep' : vert_sep}
 
     slip_comps['hor_sep'] = hor_sep_from_vert_sep(vert_sep, dip, rake)
     slip_comps['offset'] = offset_from_vert_sep(vert_sep, dip, rake)
@@ -196,7 +196,7 @@ def slip_components_from_vert_sep(vert_sep, dip, rake):
 
 
 def slip_components_from_dip_slip(dip_slip, dip, rake):
-    slip_comps = {}
+    slip_comps = {'dip_slip' : dip_slip}
 
     slip_comps['hor_sep'] = hor_sep_from_dip_slip(dip_slip, dip, rake)
     slip_comps['vert_sep'] = vert_sep_from_dip_slip(dip_slip, dip, rake)
@@ -208,7 +208,7 @@ def slip_components_from_dip_slip(dip_slip, dip, rake):
 
 
 def slip_components_from_strike_slip(strike_slip, dip, rake):
-    slip_comps = {}
+    slip_comps = {'strike_slip' : strike_slip}
 
     slip_comps['hor_sep'] = hor_sep_from_strike_slip(strike_slip, dip, rake)
     slip_comps['vert_sep'] = vert_sep_from_strike_slip(strike_slip, dip, rake)
@@ -220,7 +220,7 @@ def slip_components_from_strike_slip(strike_slip, dip, rake):
 
 
 def slip_components_from_heave(heave, dip, rake):
-    slip_comps = {}
+    slip_comps = {'heave' : heave}
 
     slip_comps['hor_sep'] = hor_sep_from_heave(heave, dip, rake)
     slip_comps['vert_sep'] = vert_sep_from_heave(heave, dip, rake)
