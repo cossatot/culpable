@@ -3,7 +3,7 @@ import numpy as np
 import attr
 from attr.validators import instance_of, optional
 
-from .stats import inverse_transform_sample, sample_from_bounded_normal
+from .stats import inverse_transform_sample, sample_from_bounded_normal #, kde
 from .fault_projections import *
 
 
@@ -206,7 +206,6 @@ class OffsetMarker(object):
                                     #validator=instance_of(np.array)
                                     )
 
-
     # Strike-slip parameters
     strike_slip_units = attr.ib(default='m', validator=validate_distance_units)
     strike_slip_dist_type = attr.ib(default='unspecified', 
@@ -347,7 +346,6 @@ class OffsetMarker(object):
                      }
 
         return {k: v for k, v in comp_dict.items() if v not in ([], None)}
-   
 
     def propagate_scalar_slip_components(self):
         comp, comp_val = self._find_entered_slip_val().popitem()
@@ -419,7 +417,101 @@ class OffsetMarker(object):
         self.strike_slip_median = slip_comps['strike_slip']
         self.heave_median = slip_comps['heave']
 
+    def propagate_slip_comps_from_offset_probs(self, offsets, dips, rakes):
+
+        #self.hor_separation_vals, self.hor_separation_probs = kde(
+        #                             hor_sep_from_offset(offsets, dips, rakes)
+        raise NotImplementedError
+
+
+    def sample_entered_comp(self, n=1000):
+        # this just needs to be for initial slip comp propagation.
+        # it could have unintended consequences if multiple slip comps exist.
+        # need to define other functions for sampling slip comps, even if they
+        # share a lot of function(alitie)s.
+        comp, comp_val = self._find_entered_slip_val().popitem() #if offest in?
+
+        if comp.split('_')[0] == 'offset':
+            return self.sample_offset(self, n)
+
+        elif comp == 'hor_separation_mean':
+            hor_seps = np.random.normal(comp_val, self.hor_separation_sd, n)
+            rakes = self.sample_rakes(n)
+            dips = self.sample_dips(n)
+
+            offsets = offset_from_hor_sep(hor_seps, dips, rakes)
+
+            self.propagate_slip_comps_from_offset_probs(offsets)
+
+
+
+        elif comp == 'hor_separation_median':
+            raise NotImplementedError
+        
+        elif comp == 'hor_separation_max':
+            raise NotImplementedError
+
+        elif comp == 'hor_separation_probs':
+            raise NotImplementedError
+
+        elif comp == 'vert_separation_mean':
+            slip_comps = slip_components_from_vert_sep(comp_val, 
+                                                      self.dip_mean,
+                                                      self.rake_mean)
+        elif comp == 'vert_separation_median':
+            slip_comps = slip_components_from_vert_sep(comp_val, 
+                                                      self.dip_median,
+                                                      self.rake_median)
+        elif comp == 'strike_slip_mean':
+            slip_comps = slip_components_from_strike_slip(comp_val, 
+                                                          self.dip_mean,
+                                                         self.rake_mean)
+        elif comp == 'strike_slip_median':
+            slip_comps = slip_components_from_strike_slip(comp_val, 
+                                                          self.dip_median,
+                                                          self.rake_median)
+        elif comp == 'dip_slip_mean':
+            slip_comps = slip_components_from_dip_slip(comp_val, 
+                                                       self.dip_mean,
+                                                       self.rake_mean)
+        elif comp == 'dip_slip_median':
+            slip_comps = slip_components_from_dip_slip(comp_val, 
+                                                       self.dip_median,
+                                                       self.rake_median)
+        elif comp == 'heave_mean':
+            slip_comps = slip_components_from_heave(comp_val, self.dip_mean,
+                                                    self.rake_mean)
+        elif comp == 'heave_median':
+            slip_comps = slip_components_from_heave(comp_val, self.dip_median,
+                                                    self.rake_median)
+
+
+
+
+    def mc_slip_comp_propagation(self):
+        comp, comp_val = self._find_entered_slip_val().popitem()
+
+        
+        
+        # sample slip comp
+        # sample rakes, dips
+        # calc offset dist
+        # propagate other slip comps
+
+
+        pass
+
+
+
+
     # sampling
+
+    def sample_rakes(self, n):
+        raise NotImplementedError
+
+    def sample_dips(self, n):
+        raise NotImplementedError
+
     def sample_offset_from_normal(self, n):
         """Generates n-length sample from normal distribution of offsets"""
 
