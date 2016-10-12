@@ -158,4 +158,76 @@ def strike_slip_from_heave(heave, dip, rake=0.):
     return strike_slip_from_offset(offset, dip, rake)
 
 
+# aggregator functions
+def slip_components_from_offset(offset, rake, dip):
+    slip_comps = {}
+
+    slip_comps['hor_sep'] = hor_sep_from_offset(offset, rake, dip)
+    slip_comps['vert_sep'] = vert_sep_from_offset(offset, rake, dip)
+    slip_comps['dip_slip'] = dip_slip_from_offset(offset, rake, dip)
+    slip_comps['strike_slip'] = strike_slip_from_offset(offset, rake, dip)
+    slip_comps['heave'] = heave_from_offset(offset, strike, dip)
+
+    return slip_comps
+
+
+def slip_components_from_hor_sep(hor_sep, rake, dip):
+    slip_comps = {}
+
+    slip_comps['offset'] = offset_from_hor_sep(hor_sep, rake, dip)
+    slip_comps['vert_sep'] = vert_sep_from_hor_sep(hor_sep, rake, dip)
+    slip_comps['dip_slip'] = dip_slip_from_hor_sep(hor_sep, rake, dip)
+    slip_comps['strike_slip'] = strike_slip_from_hor_sep(hor_sep, rake, dip)
+    slip_comps['heave'] = heave_from_hor_sep(hor_sep, strike, dip)
+
+    return slip_comps
+
+
+def slip_components_from_vert_sep(vert_sep, rake, dip):
+    slip_comps = {}
+
+    slip_comps['hor_sep'] = hor_sep_from_vert_sep(vert_sep, rake, dip)
+    slip_comps['offset'] = offset_from_vert_sep(vert_sep, rake, dip)
+    slip_comps['dip_slip'] = dip_slip_from_vert_sep(vert_sep, rake, dip)
+    slip_comps['strike_slip'] = strike_slip_from_vert_sep(vert_sep, rake, dip)
+    slip_comps['heave'] = heave_from_vert_sep(vert_sep, strike, dip)
+
+    return slip_comps
+
+
+def slip_components_from_dip_slip(dip_slip, rake, dip):
+    slip_comps = {}
+
+    slip_comps['hor_sep'] = hor_sep_from_dip_slip(dip_slip, rake, dip)
+    slip_comps['vert_sep'] = vert_sep_from_dip_slip(dip_slip, rake, dip)
+    slip_comps['offset'] = offset_from_dip_slip(dip_slip, rake, dip)
+    slip_comps['strike_slip'] = strike_slip_from_dip_slip(dip_slip, rake, dip)
+    slip_comps['heave'] = heave_from_dip_slip(dip_slip, strike, dip)
+
+    return slip_comps
+
+
+def slip_components_from_strike_slip(strike_slip, rake, dip):
+    slip_comps = {}
+
+    slip_comps['hor_sep'] = hor_sep_from_strike_slip(strike_slip, rake, dip)
+    slip_comps['vert_sep'] = vert_sep_from_strike_slip(strike_slip, rake, dip)
+    slip_comps['dip_slip'] = dip_slip_from_strike_slip(strike_slip, rake, dip)
+    slip_comps['offset'] = offset_from_strike_slip(strike_slip, rake, dip)
+    slip_comps['heave'] = heave_from_strike_slip(strike_slip, strike, dip)
+
+    return slip_comps
+
+
+def slip_components_from_heave(heave, rake, dip):
+    slip_comps = {}
+
+    slip_comps['hor_sep'] = hor_sep_from_heave(heave, rake, dip)
+    slip_comps['vert_sep'] = vert_sep_from_heave(heave, rake, dip)
+    slip_comps['dip_slip'] = dip_slip_from_heave(heave, rake, dip)
+    slip_comps['strike_slip'] = strike_slip_from_heave(heave, rake, dip)
+    slip_comps['offset'] = offset_from_heave(heave, strike, dip)
+
+    return slip_comps
+
 
