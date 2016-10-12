@@ -350,54 +350,58 @@ class OffsetMarker(object):
    
 
     def propagate_scalar_slip_components(self):
-        comp, comp_val = list(self._find_entered_slip_val())[0]
+        comp, comp_val = self._find_entered_slip_val().popitem()
 
         if comp == 'offset_mean':
-            slip_comps = slip_comps_from_offset(comp_val, self.dip_mean,
-                                                self.rake_mean)
-        elif comp == 'offset_median':
-            slip_comps = slip_comps_from_offset(comp_val, self.dip_median,
-                                                self.rake_median)
-        elif comp == 'hor_separation_mean':
-            slip_comps = slip_comps_from_hor_separation(comp_val, 
-                                                        self.dip_mean,
-                                                        self.rake_mean)
-        elif comp == 'hor_separation_median':
-            slip_comps = slip_comps_from_hor_separation(comp_val, 
-                                                        self.dip_median,
-                                                        self.rake_median)
-        elif comp == 'vert_separation_mean':
-            slip_comps = slip_comps_from_vert_separation(comp_val, 
-                                                         self.dip_mean,
-                                                         self.rake_mean)
-        elif comp == 'vert_separation_median':
-            slip_comps = slip_comps_from_vert_separation(comp_val, 
-                                                         self.dip_median,
-                                                         self.rake_median)
-        elif comp == 'strike_slip_mean':
-            slip_comps = slip_comps_from_strike_slip(comp_val, self.dip_mean,
+            slip_comps = slip_components_from_offset(comp_val, self.dip_mean,
                                                      self.rake_mean)
-        elif comp == 'strike_slip_median':
-            slip_comps = slip_comps_from_strike_slip(comp_val, self.dip_median,
+        elif comp == 'offset_median':
+            slip_comps = slip_components_from_offset(comp_val, self.dip_median,
                                                      self.rake_median)
+        elif comp == 'hor_separation_mean':
+            slip_comps = slip_components_from_hor_sep(comp_val, 
+                                                      self.dip_mean,
+                                                      self.rake_mean)
+        elif comp == 'hor_separation_median':
+            slip_comps = slip_components_from_hor_sep(comp_val, 
+                                                      self.dip_median,
+                                                      self.rake_median)
+        elif comp == 'vert_separation_mean':
+            slip_comps = slip_components_from_vert_sep(comp_val, 
+                                                      self.dip_mean,
+                                                      self.rake_mean)
+        elif comp == 'vert_separation_median':
+            slip_comps = slip_components_from_vert_sep(comp_val, 
+                                                      self.dip_median,
+                                                      self.rake_median)
+        elif comp == 'strike_slip_mean':
+            slip_comps = slip_components_from_strike_slip(comp_val, 
+                                                          self.dip_mean,
+                                                         self.rake_mean)
+        elif comp == 'strike_slip_median':
+            slip_comps = slip_components_from_strike_slip(comp_val, 
+                                                          self.dip_median,
+                                                          self.rake_median)
         elif comp == 'dip_slip_mean':
-            slip_comps = slip_comps_from_dip_slip(comp_val, self.dip_mean,
-                                                  self.rake_mean)
+            slip_comps = slip_components_from_dip_slip(comp_val, 
+                                                       self.dip_mean,
+                                                       self.rake_mean)
         elif comp == 'dip_slip_median':
-            slip_comps = slip_comps_from_dip_slip(comp_val, self.dip_median,
-                                                  self.rake_median)
+            slip_comps = slip_components_from_dip_slip(comp_val, 
+                                                       self.dip_median,
+                                                       self.rake_median)
         elif comp == 'heave_mean':
-            slip_comps = slip_comps_from_heave(comp_val, self.dip_mean,
-                                                self.rake_mean)
+            slip_comps = slip_components_from_heave(comp_val, self.dip_mean,
+                                                    self.rake_mean)
         elif comp == 'heave_median':
-            slip_comps = slip_comps_from_heave(comp_val, self.dip_median,
-                                                self.rake_median)
+            slip_comps = slip_components_from_heave(comp_val, self.dip_median,
+                                                    self.rake_median)
         
         if comp.split('_')[-1] == 'mean':
-            propagate_slip_comps_from_offset_mean(slip_comps)
+            self.propagate_slip_comps_from_offset_mean(slip_comps)
         
         elif comp.split('_')[-1] == 'median':
-            propagate_slip_comps_from_offset_median(slip_comps)
+            self.propagate_slip_comps_from_offset_median(slip_comps)
         
     def propagate_slip_comps_from_offset_mean(self, slip_comps):
 
