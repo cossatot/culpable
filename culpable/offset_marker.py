@@ -69,6 +69,20 @@ def _sample(self, n=1000, return_scalar_array=False):
             return self.mean
 
 
+def _check_dist_types(self):
+    # Consider raising exception instead of changing state
+    # or at least issue a warning
+    if self.mean is not None and self.sd is not None:
+        self.dist_type = 'normal'
+    elif (self.min is not None and self.max is not None
+          and self.sd == None):
+        self.dist_type = 'uniform'
+    elif self.probs is not None and self.vals is not None:
+        self.dist_type = 'arbitrary'
+
+    
+
+
 @attr.s
 class SlipComponent(object):
     units = attr.ib(default='m', validator=validate_distance_units)
@@ -92,6 +106,9 @@ class SlipComponent(object):
                     #convert=np.array,
                     #validator=instance_of(np.array)
                     )
+
+    def check_dist_types(self):
+        _check_dist_types(self)
 
     def sample(self, n=1000, return_scalar_array=False):
         return _sample(self, **kwargs)
@@ -122,6 +139,9 @@ class FaultAngle(object):
                     #validator=instance_of(np.array)
                     )
 
+    def check_dist_types(self):
+        _check_dist_types(self)
+
     def sample(self, n=1000, return_scalar_array=False):
         return _sample(self, **kwargs)
 
@@ -150,6 +170,9 @@ class Age(object):
                     #convert=np.array,
                     #validator=instance_of(np.array)
                     )
+
+    def check_dist_types(self):
+        _check_dist_types(self)
 
     def sample(self, n=1000, return_scalar_array=False):
         return _sample(self, **kwargs)
@@ -516,43 +539,7 @@ class OffsetMarker(object):
                                         vals=self.heave_vals,
                                         probs=self.heave_probs)
 
-
-
-
-
-
-    def check_age_dist_type(self):
-        if self.age_dist_type == 'unspecified':
-            if self.age_mean is not None and self.age_sd is not None:
-                self.age_dist_type = 'normal'
-            elif (self.age_min is not None and self.age_max is not None
-                  and self.age_sd == None):
-                self.age_dist_type = 'uniform'
-            elif self.age_probs is not None and self.age_vals is not None:
-                self.age_dist_type = 'arbitrary'
-
-    def check_offset_dist_type(self):
-        # move to SlipComponent?
-        if self.offset_dist_type == 'unspecified':
-            if self.offset_mean is not None and self.offset_sd is not None:
-                self.offset_dist_type = 'normal'
-            elif (self.offset_min is not None and self.offset_max is not None
-                  and self.offset_sd == None):
-                self.offset_dist_type = 'uniform'
-            elif offset_probs is not None and offset_vals is not None:
-                self.offset_dist_type = 'arbitrary'
-            #TODO: add some check for 'scalar'
-
-    #TODO: check dist type of all offsets entered
-
-    def check_dist_types(self):
-        check_age_dist_type()
-        check_offset_dist_type()
-
-
-    def check_offset_consistency(self):
-        pass
-
+    ### slip component propagation bullshit
     def fill_all_offsets(self):
         '''
         Fills values for all offsets given dip, rake, and any offset type
@@ -730,23 +717,25 @@ class OffsetMarker(object):
                                                     self.rake_median)
 
 
-
-
     def mc_slip_comp_propagation(self):
         comp, comp_val = self._find_entered_slip_val().popitem()
-
-        
-        
         # sample slip comp
         # sample rakes, dips
         # calc offset dist
         # propagate other slip comps
 
-
         pass
 
 
+
+
     # sampling
+
+
+    # consider sampling strategy for components
+    # where offset (or other component)
+    # is sampled and then transformed through those functions.
+    # Not sure of importance of mc_slip_comp_propagation.
 
     def sample_rakes(self, n):
         if not self.rake:
@@ -754,89 +743,32 @@ class OffsetMarker(object):
 
         return self.rake.sample(n)
 
-
     def sample_dips(self, n):
         if not self.dip:
             _init_dip(self)
 
         return self.dip.sample(n)
-
-
-
-    '''
-    def sample_offset_from_normal(self, n):
-        """Generates n-length sample from normal distribution of offsets"""
-
-        return sample_from_bounded_normal(self.offset_mean, self.offset_sd, n,
-                                          self.offset_min, self.offset_max)
     
-    def sample_offset_from_uniform(self, n):
-        """Generates n-length sample from uniform distribution of offsets"""
-        
-        return np.random.uniform(self.offset_min, self.offset_max, n)
-    
-    def sample_offset_from_arbitrary(self, n):
-        """Generates n-length sample from arbitrary distribution of offsets"""
-        offset_sample = inverse_transform_sample(self.offset_vals,
-                                                 self.offset_probs, n)
-        return offset_sample
-    
-    def sample_offset(self, n):
-        """Generates n-length array of samples from distribution"""
+    def sample_ages(self, n):
+        if not age.dip:
+            _init_age(self)
 
-        self.check_offset_dist_type()
+        return self.dip.sample(n)
 
-        if self.offset_dist_type == 'normal':
-            offset_sample = self.sample_offset_from_normal(n)
-        
-        elif self.offset_dist_type == 'uniform':
-            offset_sample = self.sample_offset_from_uniform(n)
-        
-        elif self.offset_dist_type == 'arbitrary':
-            offset_sample = self.sample_offset_from_arbitrary(n)
-        
-        return offset_sample    
-    
-    def sample_age_from_normal(self, n):
-        """Generates n-length sample from normal distribution of ages"""
-        if self.age_min:
-            age_min = self.age_min
-        else:
-            age_min = 0.
+    def sample_offsets(self, n):
 
-        age_sample = sample_from_bounded_normal(self.age_mean, self.age_sd, n,
-                                                age_min, self.age_max)
+        # convert whatever to offsets first?
 
-        return age_sample
-    
-    def sample_age_from_uniform(self, n):
-        """Generates n-length sample from uniform distribution of ages"""
-        return np.random.uniform(self.age_min, self.age_max, n)
-        
-    def sample_age_from_arbitrary(self, n):
-        """Generates n-length sample from uniform distribution of ages"""
-        return inverse_transform_sample(self.age_vals, self.age_probs, n)
+        if not self.offset:
+            _init_offset(self)
 
-    def sample_age(self, n):
-        """Generates n-length array of samples from distribution"""
+        return self.offset.sample(n)
 
-        self.check_age_dist_type()
 
-        if self.age_dist_type == 'normal':
-            age_sample = self.sample_age_from_normal(n)
-        
-        elif self.age_dist_type == 'uniform':
-            age_sample = self.sample_age_from_uniform(n)
-        
-        elif self.age_dist_type == 'arbitrary':
-            age_sample = self.sample_age_from_arbitrary(n)
-        
-        return age_sample
-    '''
 
     def sample(self, n):
-        age_sample = self.sample_age(n)
-        offset_sample = self.sample_offset(n)
+        age_sample = self.sample_ages(n)
+        offset_sample = self.sample_offsets(n)
         
         asl = len(age_sample)
         osl = len(offset_sample)
