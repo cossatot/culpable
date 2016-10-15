@@ -13,6 +13,8 @@ from .stats import inverse_transform_sample
 
 @attr.s
 class RecKDE(object):
+    # consider generalizing this w/ kde in stats module,
+    # or using scipy gaussian_kde to remove statsmodels dependency
 
     data = attr.ib(default=attr.Factory(np.array), convert=np.array,
                    validator=instance_of(np.array))

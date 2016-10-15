@@ -42,6 +42,122 @@ def validate_dist_type(instance, age_dist_type, value):
                                                acceptable_distribution_types))
 
 
+def validate_angle(instance, attribute, value):
+    if (value < 0.) or (value > 90.):
+        raise ValueError("Only angles between 0 and 90 acceptable")
+
+
+def _sample(self, n=1000, return_scalar_array=False):
+    '''
+    Main sampling function. It is defined as a function for use in multiple
+    classes as a method without inheritance, and is not meant to be called
+    as a separate function; nonetheless, it can if a class w/ the requisite
+    attributes (dist_type, mean, sd, max, min, etc.) are present.
+    '''
+    if self.dist_type == 'normal':
+        return sample_from_bounded_normal(self.mean, self.sd, n,
+                                          sample_min=self.min, 
+                                          sample_max=self.max)
+    elif self.dist_type == 'uniform':
+        return np.random.uniform(self.min, self.max, n)
+    elif self.dist_type == 'arbitrary':
+        return inverse_transform_sample(self.vals, self.probs, n)
+    elif self.dist_type == 'scalar':
+        if return_scalar_array == True:
+            return np.ones(n) * self.mean
+        else:
+            return self.mean
+
+
+@attr.s
+class SlipComponent(object):
+    units = attr.ib(default='m', validator=validate_distance_units)
+    dist_type = attr.ib(default='unspecified', validator=validate_dist_type)
+    mean = attr.ib(default=None, convert=float,
+                   validator=optional(instance_of(float)))
+    median= attr.ib(default=None,convert=float, 
+                    validator=optional(instance_of(float)))
+    sd = attr.ib(default=None, convert=float, 
+                 validator=optional(instance_of(float)))
+    mad = attr.ib(default=None, convert=float, 
+                  validator=optional(instance_of(float)))
+    min = attr.ib(default=None, convert=float, 
+                  validator=optional(instance_of(float)))
+    max = attr.ib(default=None, convert=float, 
+                  validator=optional(instance_of(float)))
+    vals = attr.ib(default=attr.Factory(list), #convert=np.array,
+                   #validator=instance_of(np.array)
+                   )
+    probs = attr.ib(default=attr.Factory(list), 
+                    #convert=np.array,
+                    #validator=instance_of(np.array)
+                    )
+
+    def sample(self, n=1000, return_scalar_array=False):
+        return _sample(self, **kwargs)
+
+
+@attr.s
+class FaultAngle(object):
+    # maybe need to do more to incorporate strike
+    dist_type = attr.ib(default='unspecified', validator=validate_dist_type)
+    mean = attr.ib(default=None, convert=float, 
+                   validator=optional(validate_angle))
+    median= attr.ib(default=None, convert=float, 
+                    validator=optional(validate_angle))
+    sd = attr.ib(default=None, convert=float, 
+                 validator=optional(validate_angle))
+    mad = attr.ib(default=None, convert=float, 
+                  validator=optional(validate_angle))
+    min = attr.ib(default=None, convert=float, 
+                  validator=optional(validate_angle))
+    max = attr.ib(default=None, convert=float, 
+                  validator=optional(validate_angle))
+    
+    vals = attr.ib(default=attr.Factory(list), #convert=np.array,
+                   #validator=instance_of(np.array)
+                   )
+    probs = attr.ib(default=attr.Factory(list), 
+                    #convert=np.array,
+                    #validator=instance_of(np.array)
+                    )
+
+    def sample(self, n=1000, return_scalar_array=False):
+        return _sample(self, **kwargs)
+
+
+@attr.s
+class Age(object):
+    units = attr.ib(default='m', validator=validate_distance_units)
+    dist_type = attr.ib(default='unspecified', convert=float, 
+                        validator=validate_dist_type)
+    mean = attr.ib(default=None, convert=float, 
+                   validator=optional(instance_of(float)))
+    median= attr.ib(default=None,convert=float, 
+                    validator=optional(instance_of(float)))
+    sd = attr.ib(default=None, convert=float, 
+                 validator=optional(instance_of(float)))
+    mad = attr.ib(default=None, convert=float, 
+                  validator=optional(instance_of(float)))
+    min = attr.ib(default=None, convert=float, 
+                  validator=optional(instance_of(float)))
+    max = attr.ib(default=None, convert=float, 
+                  validator=optional(instance_of(float)))
+    vals = attr.ib(default=attr.Factory(list), #convert=np.array,
+                   #validator=instance_of(np.array)
+                   )
+    probs = attr.ib(default=attr.Factory(list), 
+                    #convert=np.array,
+                    #validator=instance_of(np.array)
+                    )
+
+    def sample(self, n=1000, return_scalar_array=False):
+        return _sample(self, **kwargs)
+
+
+
+
+
 @attr.s
 class OffsetMarker(object):
     
@@ -278,6 +394,133 @@ class OffsetMarker(object):
                            #validator=instance_of(np.array)
                            )
 
+
+    # attribute class initializations
+    def init_slip_components(self):
+        self.init_offset()
+        self.init_hor_separation()
+        self.init_vert_separation()
+        self.init_strike_slip()
+        self.init_dip_slip()
+        self.init_heave()
+
+
+    def _init_age(self):
+        if not self.age:
+            self.age = Age(dist_type=self.age_dist_type,
+                           mean=self.age_mean,
+                           median=self.age_median,
+                           sd=self.age_sd,
+                           mad=self.age_mad,
+                           min=self.age_min,
+                           max=self.age_max,
+                           vals=self.age_vals,
+                           probs=self.age_probs)
+
+
+    def _init_rake(self):
+        if not self.rake:
+            self.rake = FaultAngle(dist_type=self.rake_dist_type,
+                                   mean=self.rake_mean,
+                                   median=self.rake_median,
+                                   sd=self.rake_sd,
+                                   mad=self.rake_mad,
+                                   min=self.rake_min,
+                                   max=self.rake_max,
+                                   vals=self.rake_vals,
+                                   probs=self.rake_probs)
+
+    def _init_dip(self):
+        if not self.dip:
+            self.dip = FaultAngle(dist_type=self.dip_dist_type,
+                                  mean=self.dip_mean,
+                                  median=self.dip_median,
+                                  sd=self.dip_sd,
+                                  mad=self.dip_mad,
+                                  min=self.dip_min,
+                                  max=self.dip_max,
+                                  vals=self.dip_vals,
+                                  probs=self.dip_probs)
+
+    def _init_offset(self):
+        if not self.offset:
+            self.offset = SlipComponent(dist_type=self.offset_dist_type,
+                                        mean=self.offset_mean,
+                                        median=self.offset_median,
+                                        sd=self.offset_sd,
+                                        mad=self.offset_mad,
+                                        min=self.offset_min,
+                                        max=self.offset_max,
+                                        vals=self.offset_vals,
+                                        probs=self.offset_probs)
+
+    def _init_hor_separation(self):
+        if not self.hor_separation:
+            self.hor_separation = SlipComponent(
+                                       dist_type=self.hor_separation_dist_type,
+                                        mean=self.hor_separation_mean,
+                                        median=self.hor_separation_median,
+                                        sd=self.hor_separation_sd,
+                                        mad=self.hor_separation_mad,
+                                        min=self.hor_separation_min,
+                                        max=self.hor_separation_max,
+                                        vals=self.hor_separation_vals,
+                                        probs=self.hor_separation_probs)
+
+    def _init_vert_separation(self):
+        if not self.vert_separation:
+            self.vert_separation = SlipComponent(
+                                      dist_type=self.vert_separation_dist_type,
+                                        mean=self.vert_separation_mean,
+                                        median=self.vert_separation_median,
+                                        sd=self.vert_separation_sd,
+                                        mad=self.vert_separation_mad,
+                                        min=self.vert_separation_min,
+                                        max=self.vert_separation_max,
+                                        vals=self.vert_separation_vals,
+                                        probs=self.vert_separation_probs)
+
+    def _init_dip_slip(self):
+        if not self.dip_slip:
+            self.dip_slip = SlipComponent(dist_type=self.dip_slip_dist_type,
+                                        mean=self.dip_slip_mean,
+                                        median=self.dip_slip_median,
+                                        sd=self.dip_slip_sd,
+                                        mad=self.dip_slip_mad,
+                                        min=self.dip_slip_min,
+                                        max=self.dip_slip_max,
+                                        vals=self.dip_slip_vals,
+                                        probs=self.dip_slip_probs)
+
+    def _init_strike_slip(self):
+        if not self.strike_slip:
+            self.strike_slip = SlipComponent(dist_type=self.strike_slip_dist_type,
+                                        mean=self.strike_slip_mean,
+                                        median=self.strike_slip_median,
+                                        sd=self.strike_slip_sd,
+                                        mad=self.strike_slip_mad,
+                                        min=self.strike_slip_min,
+                                        max=self.strike_slip_max,
+                                        vals=self.strike_slip_vals,
+                                        probs=self.strike_slip_probs)
+
+    def _init_heave(self):
+        if not self.heave:
+            self.heave = SlipComponent(dist_type=self.heave_dist_type,
+                                        mean=self.heave_mean,
+                                        median=self.heave_median,
+                                        sd=self.heave_sd,
+                                        mad=self.heave_mad,
+                                        min=self.heave_min,
+                                        max=self.heave_max,
+                                        vals=self.heave_vals,
+                                        probs=self.heave_probs)
+
+
+
+
+
+
     def check_age_dist_type(self):
         if self.age_dist_type == 'unspecified':
             if self.age_mean is not None and self.age_sd is not None:
@@ -289,6 +532,7 @@ class OffsetMarker(object):
                 self.age_dist_type = 'arbitrary'
 
     def check_offset_dist_type(self):
+        # move to SlipComponent?
         if self.offset_dist_type == 'unspecified':
             if self.offset_mean is not None and self.offset_sd is not None:
                 self.offset_dist_type = 'normal'
@@ -502,16 +746,24 @@ class OffsetMarker(object):
         pass
 
 
-
-
     # sampling
 
     def sample_rakes(self, n):
-        raise NotImplementedError
+        if not self.rake:
+            _init_rake(self)
+
+        return self.rake.sample(n)
+
 
     def sample_dips(self, n):
-        raise NotImplementedError
+        if not self.dip:
+            _init_dip(self)
 
+        return self.dip.sample(n)
+
+
+
+    '''
     def sample_offset_from_normal(self, n):
         """Generates n-length sample from normal distribution of offsets"""
 
@@ -553,7 +805,7 @@ class OffsetMarker(object):
             age_min = 0.
 
         age_sample = sample_from_bounded_normal(self.age_mean, self.age_sd, n,
-                                           age_min, self.age_max)
+                                                age_min, self.age_max)
 
         return age_sample
     
@@ -580,6 +832,7 @@ class OffsetMarker(object):
             age_sample = self.sample_age_from_arbitrary(n)
         
         return age_sample
+    '''
 
     def sample(self, n):
         age_sample = self.sample_age(n)

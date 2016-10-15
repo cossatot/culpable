@@ -1,6 +1,7 @@
 import numpy as np
 from scipy.interpolate import interp1d
 from scipy.integrate import trapz, cumtrapz
+from scipy.stats import gaussian_kde
 
 # basic pdf stuff
 def make_pdf(vals, probs, n_interp=1000):
@@ -34,6 +35,26 @@ def make_cdf(pdf_range, pdf_probs):
 
 def pdf_mean(pdf_vals, pdf_probs):
     return trapz(pdf_vals * pdf_probs, pdf_vals)
+
+
+def pdf_from_samples(samples, n=100, x_min=None, x_max=None, cut=None):
+    _kde = gaussian_kde(samples)
+
+    if cut == None:
+        bw = _kde.factor
+        cut = 3 * bw
+    
+    if x_min == None:
+        x_min = np.min(samples) - cut
+
+    if x_max == None:
+        x_max = np.max(samples) + cut
+
+    support = np.linspace(x_min, x_max, n)
+    px = _kde.evaluate(support)
+    px /= np.trapz(px, support)
+
+    return support, px
 
 
 # sampling
