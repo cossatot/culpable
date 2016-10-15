@@ -517,7 +517,8 @@ class OffsetMarker(object):
 
     def _init_strike_slip(self):
         if not self.strike_slip:
-            self.strike_slip = SlipComponent(dist_type=self.strike_slip_dist_type,
+            self.strike_slip = SlipComponent(
+                                        dist_type=self.strike_slip_dist_type,
                                         mean=self.strike_slip_mean,
                                         median=self.strike_slip_median,
                                         sd=self.strike_slip_sd,
@@ -578,6 +579,12 @@ class OffsetMarker(object):
 
         return {k: v for k, v in comp_dict.items() if v not in ([], None)}
 
+    def _get_entered_slip_component(self):
+        comp, comp_val = self._find_entered_slip_val().popitem()
+
+        component = comp.split('_')[:-1]
+        return component
+
     def propagate_scalar_slip_components(self):
         comp, comp_val = self._find_entered_slip_val().popitem()
 
@@ -597,16 +604,16 @@ class OffsetMarker(object):
                                                       self.rake_median)
         elif comp == 'vert_separation_mean':
             slip_comps = slip_components_from_vert_sep(comp_val, 
-                                                      self.dip_mean,
-                                                      self.rake_mean)
+                                                       self.dip_mean,
+                                                       self.rake_mean)
         elif comp == 'vert_separation_median':
             slip_comps = slip_components_from_vert_sep(comp_val, 
-                                                      self.dip_median,
-                                                      self.rake_median)
+                                                       self.dip_median,
+                                                       self.rake_median)
         elif comp == 'strike_slip_mean':
             slip_comps = slip_components_from_strike_slip(comp_val, 
                                                           self.dip_mean,
-                                                         self.rake_mean)
+                                                          self.rake_mean)
         elif comp == 'strike_slip_median':
             slip_comps = slip_components_from_strike_slip(comp_val, 
                                                           self.dip_median,
@@ -655,7 +662,7 @@ class OffsetMarker(object):
         raise NotImplementedError
 
 
-    def sample_entered_comp(self, n=1000):
+    def _sample_entered_comp(self, n=1000):
         # this just needs to be for initial slip comp propagation.
         # it could have unintended consequences if multiple slip comps exist.
         # need to define other functions for sampling slip comps, even if they
@@ -760,6 +767,8 @@ class OffsetMarker(object):
         # convert whatever to offsets first?
 
         if not self.offset:
+
+            
             _init_offset(self)
 
         return self.offset.sample(n)
