@@ -9,7 +9,6 @@ def make_pdf(vals, probs, n_interp=1000):
     Takes a sequence of x (values) and p(x) (probs) and makes a PDF
     """
     
-    
     val_min = np.min(vals)
     val_max = np.max(vals)
     
