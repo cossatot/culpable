@@ -77,6 +77,16 @@ def _sample(self, n=1000, return_scalar_array=False):
     classes as a method without inheritance, and is not meant to be called
     as a separate function; nonetheless, it can if a class w/ the requisite
     attributes (dist_type, mean, sd, max, min, etc.) are present.
+
+    Parameters
+    ----------
+    n : int 
+        Number of samples to be returned
+    return_scalar_array: Bool, default=False
+        Determines whether a single scalar (e.g., 4) or an array of
+        equal scalars (e.g., [4, 4, 4, 4, 4]) is returned when there
+        is no uncertainty in the distribution, i.e. when all inputs
+        are scalar.
     '''
     if self.dist_type == 'normal':
         return sample_from_bounded_normal(self.mean, self.sd, n,
@@ -93,6 +103,8 @@ def _sample(self, n=1000, return_scalar_array=False):
             return self.mean
 
 def _check_dist_types(self):
+    '''Checks to consistency among arguments and distribution types.
+    May not be up to date.'''
     # Consider raising exception instead of changing state
     # or at least issue a warning
     if self.mean is not None and self.sd is not None:
@@ -107,6 +119,9 @@ def _check_dist_types(self):
 
 @attr.s
 class SlipComponent(object):
+    '''Class for a component of fault slip. It contains methods for
+    sampling as well as attributes for the values and categories of
+    slip.'''
     units = attr.ib(default='m', 
                     validator=validate_distance_units)
     dist_type = attr.ib(default='unspecified', 
@@ -146,6 +161,7 @@ class SlipComponent(object):
 
 @attr.s
 class FaultAngle(object):
+    '''Basic class for angular fault geometry parameters.'''
     # maybe need to do more to incorporate strike
     dist_type = attr.ib(default='unspecified', 
                         validator=validate_dist_type)
@@ -185,6 +201,8 @@ class FaultAngle(object):
 
 @attr.s
 class Age(object):
+    '''Class for the age of an offset marker.  Contains functionality
+    for sampling.'''
     units = attr.ib(default='ka', 
                     validator=validate_age_units)
     dist_type = attr.ib(default='unspecified', 
@@ -224,9 +242,8 @@ class Age(object):
 
 @attr.s
 class OffsetMarker(object):
-    ''' 
-    docs
-    '''
+    '''Class describing a faulted geologic unit. Contains many attributes
+    for geometry, slip/offset, and age, as well as sampling.'''
     source = attr.ib(default=None)
     metadata = attr.ib(default=None)
     name = attr.ib(default=None, validator=optional(instance_of(str)))
@@ -301,17 +318,16 @@ class OffsetMarker(object):
                                validator=validate_dist_type)
 
     #TODO: add trend
-
+    
+    #####
     # attribute class initializations
-    def init_slip_components(self):
-        self.init_offset()
-        self.init_hor_separation()
-        self.init_vert_separation()
-        self.init_strike_slip()
-        self.init_dip_slip()
-        self.init_heave()
-
+    #####
     def init(self):
+        '''Post __init__() call that does additional logic, creating
+        classes for age, fault geometry and measured offsets.
+        Will be called automatically as a post-init hook once the
+        `attrs` library has that capability; for now needs to be
+        called manually before doing any sampling or other work.'''
         if self.age is not None:
             self._init_age()
         if self.strike is not None:
@@ -502,6 +518,8 @@ class OffsetMarker(object):
            self.obs_offset_to_offset()
 
     def obs_offset_to_offset(self):
+        '''Takes obs_offset class from OffsetMarker initialization and
+           converts values to the offset class.'''
 
         if self.measured_offset_component == 'offset':
             self.offsets = self.obs_offsets
@@ -561,26 +579,87 @@ class OffsetMarker(object):
     ######
 
     def sample_rakes(self, n, return_scalar_array=True):
+        '''Samples rakes from the rake distribution parameters. 
+
+        Parameters
+        ----------
+        n : int 
+            Number of samples to be returned
+        return_scalar_array: Bool, default=False
+            Determines whether a single scalar (e.g., 4) or an array of
+            equal scalars (e.g., [4, 4, 4, 4, 4]) is returned when there
+            is no uncertainty in the distribution, i.e. when all inputs
+            are scalar.
+        '''
         if not hasattr(self, 'rakes'):
             _init_rake(self)
         return self.rakes.sample(n, return_scalar_array)
 
     def sample_dips(self, n, return_scalar_array=True):
+        '''Samples dips from the dip distribution parameters. 
+
+        Parameters
+        ----------
+        n : int 
+            Number of samples to be returned
+        return_scalar_array: Bool, default=False
+            Determines whether a single scalar (e.g., 4) or an array of
+            equal scalars (e.g., [4, 4, 4, 4, 4]) is returned when there
+            is no uncertainty in the distribution, i.e. when all inputs
+            are scalar.
+        '''
         if not hasattr(self, 'dips'):
             _init_dip(self)
         return self.dips.sample(n, return_scalar_array)
     
     def sample_ages(self, n, return_scalar_array=True):
+        '''Samples ages from the age distribution parameters. 
+
+        Parameters
+        ----------
+        n : int 
+            Number of samples to be returned
+        return_scalar_array: Bool, default=False
+            Determines whether a single scalar (e.g., 4) or an array of
+            equal scalars (e.g., [4, 4, 4, 4, 4]) is returned when there
+            is no uncertainty in the distribution, i.e. when all inputs
+            are scalar.
+        '''
         if not hasattr(self, 'ages'):
             _init_age(self)
         return self.ages.sample(n, return_scalar_array)
 
     def sample_offsets(self, n, return_scalar_array=True):
+        '''Samples offsets from the offset distribution parameters. 
+
+        Parameters
+        ----------
+        n : int 
+            Number of samples to be returned
+        return_scalar_array: Bool, default=False
+            Determines whether a single scalar (e.g., 4) or an array of
+            equal scalars (e.g., [4, 4, 4, 4, 4]) is returned when there
+            is no uncertainty in the distribution, i.e. when all inputs
+            are scalar.
+        '''
         if not self.offsets:
             _init_offset(self)
         return self.offsets.sample(n, return_scalar_array)
 
     def sample_vert_separation(self, n, return_scalar_array=True):
+        '''Samples vertical separations from the vertical separation 
+           distribution parameters, or offset data and fault geometry.
+
+        Parameters
+        ----------
+        n : int 
+            Number of samples to be returned
+        return_scalar_array: Bool, default=False
+            Determines whether a single scalar (e.g., 4) or an array of
+            equal scalars (e.g., [4, 4, 4, 4, 4]) is returned when there
+            is no uncertainty in the distribution, i.e. when all inputs
+            are scalar.
+        '''
         if self.measured_offset_component == 'vert_separation':
             return self.obs_offsets.sample(n, return_scalar_array)
         else:
@@ -594,6 +673,19 @@ class OffsetMarker(object):
                                                           return_scalar_array))
                                                         
     def sample_hor_separation(self, n, return_scalar_array=True):
+        '''Samples horizontal separations from the horizontal separation 
+           distribution parameters, or offset data and fault geometry.
+
+        Parameters
+        ----------
+        n : int 
+            Number of samples to be returned
+        return_scalar_array: Bool, default=False
+            Determines whether a single scalar (e.g., 4) or an array of
+            equal scalars (e.g., [4, 4, 4, 4, 4]) is returned when there
+            is no uncertainty in the distribution, i.e. when all inputs
+            are scalar.
+        '''
         if self.measured_offset_component == 'hor_separation':
             return self.obs_offsets.sample(n, return_scalar_array)
         else:
@@ -607,6 +699,19 @@ class OffsetMarker(object):
                                                           return_scalar_array))
 
     def sample_dip_slip(self, n, return_scalar_array=True):
+        '''Samples dip slips from the dip slip 
+           distribution parameters, or offset data and fault geometry.
+
+        Parameters
+        ----------
+        n : int 
+            Number of samples to be returned
+        return_scalar_array: Bool, default=False
+            Determines whether a single scalar (e.g., 4) or an array of
+            equal scalars (e.g., [4, 4, 4, 4, 4]) is returned when there
+            is no uncertainty in the distribution, i.e. when all inputs
+            are scalar.
+        '''
         if self.measured_offset_component == 'dip_slip':
             return self.obs_offsets.sample(n, return_scalar_array)
         else:
@@ -620,6 +725,19 @@ class OffsetMarker(object):
                                                           return_scalar_array))
 
     def sample_strike_slip(self, n, return_scalar_array=True):
+        '''Samples strike slips from the strike slip 
+           distribution parameters, or offset data and fault geometry.
+
+        Parameters
+        ----------
+        n : int 
+            Number of samples to be returned
+        return_scalar_array: Bool, default=False
+            Determines whether a single scalar (e.g., 4) or an array of
+            equal scalars (e.g., [4, 4, 4, 4, 4]) is returned when there
+            is no uncertainty in the distribution, i.e. when all inputs
+            are scalar.
+        '''
         if self.measured_offset_component == 'strike_slip':
             return self.obs_offsets.sample(n, return_scalar_array)
         else:
@@ -633,6 +751,26 @@ class OffsetMarker(object):
                                                           return_scalar_array))
 
     def sample(self, n, component='offset', return_scalar_array=True):
+        '''Samples ages and offsets from the distribution parameters and
+        fault geometry.
+
+        Parameters
+        ----------
+        n : int 
+            Number of samples to be returned
+        component: str
+            Desired component of slip (e.g., dip_slip, vert_separation).
+            Slip components are transformed from offset and fault geometry
+            parameters if the desired component is not what the OffsetMarker
+            was initialized with.
+        return_scalar_array: Bool, default=False
+            Determines whether a single scalar (e.g., 4) or an array of
+            equal scalars (e.g., [4, 4, 4, 4, 4]) is returned when there
+            is no uncertainty in the distribution, i.e. when all inputs
+            are scalar.
+        '''
+
+
         age_sample = self.sample_ages(n, return_scalar_array)
 
         if component == 'offset':
@@ -670,6 +808,8 @@ class OffsetMarker(object):
 
     # IO
     def to_dict(self, exclude=(None, 'unspecified', [])):
+        '''Returns a dictionary of initial attributes, with most default
+        or empty values stripped out.'''
         out_dict = attr.asdict(self)
 
         out_dict = {k:v for k, v in out_dict.items() if v not in exclude}
