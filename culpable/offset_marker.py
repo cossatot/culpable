@@ -1,3 +1,4 @@
+from collections import namedtuple
 import numpy as np
 
 import attr
@@ -295,7 +296,7 @@ class OffsetMarker(object):
 
     # dip stuff
     dip = attr.ib(default=None, 
-                  convert=None,
+                  convert=float,
                   validator=optional(validate_dip_rake))
     
     dip_err = attr.ib(default=None, 
@@ -769,8 +770,6 @@ class OffsetMarker(object):
             is no uncertainty in the distribution, i.e. when all inputs
             are scalar.
         '''
-
-
         age_sample = self.sample_ages(n, return_scalar_array)
 
         if component == 'offset':
@@ -787,8 +786,14 @@ class OffsetMarker(object):
             raise NameError('{} not acceptable slip component'
                             .format(component))
 
+        # make namedtuple class w/ ages, offsets and units annotated
+        OffsetMarkerSample = namedtuple('OffsetMarkerSample',
+                                        ['ages_{}'.format(self.ages.units),
+                                         'offsets_{}'
+                                         .format(self.offsets.units)])
+
         if np.isscalar(age_sample) and np.isscalar(offset_sample):
-            return age_sample, offset_sample
+            return OffsetMarkerSample(age_sample, offset_sample)
         else:
             asl = len(age_sample)
             osl = len(offset_sample)
@@ -804,7 +809,7 @@ class OffsetMarker(object):
                 offset_sample = offset_sample[:n]
                 osl = len(offset_sample)
 
-            return age_sample, offset_sample
+            return OffsetMarkerSample(age_sample, offset_sample)
 
     # IO
     def to_dict(self, exclude=(None, 'unspecified', [])):
