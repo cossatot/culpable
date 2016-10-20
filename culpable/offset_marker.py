@@ -8,6 +8,14 @@ from .stats import (inverse_transform_sample, sample_from_bounded_normal,
                     pdf_from_samples)
 from .fault_projections import *
 
+def opt(convert):
+    """Invoke the subconverter only if the value is present."""
+    def optional_converter(val):
+        if val is None:
+            return None
+        return convert(val)
+    return optional_converter
+
 
 def validate_age_units(instance, time_units, value):
     '''
@@ -128,22 +136,22 @@ class SlipComponent(object):
     dist_type = attr.ib(default='unspecified', 
                         validator=validate_dist_type)
     mean = attr.ib(default=None, 
-                   #convert=float,
+                   convert=opt(float),
                    validator=optional(instance_of(float)))
     median= attr.ib(default=None,
-                    #convert=float, 
+                    convert=opt(float), 
                     validator=optional(instance_of(float)))
     sd = attr.ib(default=None, 
-                 #convert=float, 
+                 convert=opt(float), 
                  validator=optional(instance_of(float)))
     mad = attr.ib(default=None, 
-                  #convert=float, 
+                  convert=opt(float), 
                   validator=optional(instance_of(float)))
     min = attr.ib(default=None, 
-                  #convert=float, 
+                  convert=opt(float), 
                   validator=optional(instance_of(float)))
     max = attr.ib(default=None, 
-                  #convert=float, 
+                  convert=opt(float), 
                   validator=optional(instance_of(float)))
     vals = attr.ib(default=attr.Factory(list), #convert=np.array,
                    #validator=instance_of(np.array)
@@ -167,22 +175,22 @@ class FaultAngle(object):
     dist_type = attr.ib(default='unspecified', 
                         validator=validate_dist_type)
     mean = attr.ib(default=None, 
-                   #convert=float, 
+                   convert=opt(float), 
                    validator=optional(validate_angle))
     median= attr.ib(default=None, 
-                    #convert=float, 
+                    convert=opt(float), 
                     validator=optional(validate_angle))
     sd = attr.ib(default=None, 
-                 #convert=float, 
+                 convert=opt(float), 
                  validator=optional(validate_angle))
     mad = attr.ib(default=None, 
-                  #convert=float, 
+                  convert=opt(float), 
                   validator=optional(validate_angle))
     min = attr.ib(default=None, 
-                  #convert=float, 
+                  convert=opt(float), 
                   validator=optional(validate_angle))
     max = attr.ib(default=None, 
-                  #convert=float, 
+                  convert=opt(float), 
                   validator=optional(validate_angle))
     
     vals = attr.ib(default=attr.Factory(list), #convert=np.array,
@@ -209,24 +217,25 @@ class Age(object):
     dist_type = attr.ib(default='unspecified', 
                         validator=validate_dist_type)
     mean = attr.ib(default=None, 
-                   #convert=float, 
+                   convert=opt(float), 
                    validator=optional(instance_of(float)))
     median= attr.ib(default=None,
-                    #convert=float, 
+                    convert=opt(float), 
                     validator=optional(instance_of(float)))
     sd = attr.ib(default=None, 
-                 #convert=float, 
+                 convert=opt(float), 
                  validator=optional(instance_of(float)))
     mad = attr.ib(default=None, 
-                  #convert=float, 
+                  convert=opt(float), 
                   validator=optional(instance_of(float)))
     min = attr.ib(default=None, 
-                  #convert=float, 
+                  convert=opt(float), 
                   validator=optional(instance_of(float)))
     max = attr.ib(default=None, 
-                  #convert=float, 
+                  convert=opt(float), 
                   validator=optional(instance_of(float)))
-    vals = attr.ib(default=attr.Factory(list), #convert=np.array,
+    vals = attr.ib(default=attr.Factory(list), 
+                   #convert=opt(np.float_),
                    #validator=instance_of(np.array)
                    )
     probs = attr.ib(default=attr.Factory(list), 
@@ -251,11 +260,11 @@ class OffsetMarker(object):
 
     # offset stuff
     measured_offset = attr.ib(default=None, 
-                              convert=None,
+                              convert=opt(np.float_),
                               validator=optional(validate_measured_offset))
     
     measured_offset_err = attr.ib(default=None, 
-                                  convert=None,
+                                  convert=opt(np.float_),
                                   validator=optional(validate_measured_offset))
 
     measured_offset_component = attr.ib(default='offset',
@@ -269,11 +278,11 @@ class OffsetMarker(object):
     
     # age stuff
     age = attr.ib(default=None, 
-                  convert=None,
+                  convert=opt(np.float_),
                   validator=optional(validate_age))
     
     age_err = attr.ib(default=None, 
-                      convert=None,
+                      convert=opt(np.float_),
                       validator=optional(validate_age))
 
     age_units = attr.ib(default='ka', 
@@ -284,11 +293,11 @@ class OffsetMarker(object):
 
     # strike stuff
     strike = attr.ib(default=None, 
-                     convert=None,
+                     convert=opt(np.float_),
                      validator=optional(validate_strike))
     
     strike_err = attr.ib(default=None, 
-                         convert=None,
+                         convert=opt(np.float_),
                          validator=optional(validate_strike))
 
     strike_dist_type = attr.ib(default='unspecified',
@@ -296,11 +305,11 @@ class OffsetMarker(object):
 
     # dip stuff
     dip = attr.ib(default=None, 
-                  convert=float,
+                  convert=opt(np.float_),
                   validator=optional(validate_dip_rake))
     
     dip_err = attr.ib(default=None, 
-                      convert=None,
+                      convert=opt(np.float_),
                       validator=optional(validate_dip_rake))
 
     dip_dist_type = attr.ib(default='unspecified',
@@ -308,11 +317,11 @@ class OffsetMarker(object):
 
     # rake stuff
     rake = attr.ib(default=None, 
-                   convert=None,
+                   convert=opt(np.float_),
                    validator=optional(validate_dip_rake))
     
     rake_err = attr.ib(default=None, 
-                       convert=None,
+                       convert=opt(np.float_),
                        validator=optional(validate_dip_rake))
 
     rake_dist_type = attr.ib(default='unspecified',
@@ -647,7 +656,7 @@ class OffsetMarker(object):
             _init_offset(self)
         return self.offsets.sample(n, return_scalar_array)
 
-    def sample_vert_separation(self, n, return_scalar_array=True):
+    def sample_vert_separations(self, n, return_scalar_array=True):
         '''Samples vertical separations from the vertical separation 
            distribution parameters, or offset data and fault geometry.
 
@@ -673,7 +682,7 @@ class OffsetMarker(object):
                                         self.rakes.sample(n, 
                                                           return_scalar_array))
                                                         
-    def sample_hor_separation(self, n, return_scalar_array=True):
+    def sample_hor_separations(self, n, return_scalar_array=True):
         '''Samples horizontal separations from the horizontal separation 
            distribution parameters, or offset data and fault geometry.
 
@@ -699,7 +708,7 @@ class OffsetMarker(object):
                                        self.rakes.sample(n, 
                                                           return_scalar_array))
 
-    def sample_dip_slip(self, n, return_scalar_array=True):
+    def sample_dip_slips(self, n, return_scalar_array=True):
         '''Samples dip slips from the dip slip 
            distribution parameters, or offset data and fault geometry.
 
@@ -725,7 +734,7 @@ class OffsetMarker(object):
                                         self.rakes.sample(n, 
                                                           return_scalar_array))
 
-    def sample_strike_slip(self, n, return_scalar_array=True):
+    def sample_strike_slips(self, n, return_scalar_array=True):
         '''Samples strike slips from the strike slip 
            distribution parameters, or offset data and fault geometry.
 
