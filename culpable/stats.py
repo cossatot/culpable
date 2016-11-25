@@ -36,6 +36,25 @@ def pdf_mean(pdf_vals, pdf_probs):
     return trapz(pdf_vals * pdf_probs, pdf_vals)
 
 
+def normalize_pmf(vals, probs):
+    probs_norm = probs / np.trapz(probs, vals)
+    return vals, probs_norm
+
+
+def trim_pdf(vals, probs, min=None, max=None):
+
+    if min is not None:
+        probs = probs[vals >= min]
+        vals = vals[vals >= min] # vals last b/c it gets trimmed
+    
+    if max is not None:
+        probs = probs[vals <= max]
+        vals = vals[vals <= max] # vals last b/c it gets trimmed
+
+    vals, probs = normalize_pmf(vals, probs)
+    return vals, probs
+
+
 def pdf_from_samples(samples, n=100, x_min=None, x_max=None, cut=None):
     _kde = gaussian_kde(samples)
 
@@ -51,7 +70,7 @@ def pdf_from_samples(samples, n=100, x_min=None, x_max=None, cut=None):
 
     support = np.linspace(x_min, x_max, n)
     px = _kde.evaluate(support)
-    px /= np.trapz(px, support)
+    px /= np.trapz(px, support) # possibly replace w/ normalize_pdf
 
     return support, px
 
