@@ -37,7 +37,12 @@ def pdf_mean(pdf_vals, pdf_probs):
 
 
 def normalize_pmf(vals, probs):
-    probs_norm = probs / np.trapz(probs, vals)
+
+    if vals[0] > vals[1]: 
+        probs_norm = probs / np.trapz(probs[::-1], vals[::-1])
+    else:
+        probs_norm = probs / np.trapz(probs, vals)
+ 
     return vals, probs_norm
 
 
@@ -55,8 +60,10 @@ def trim_pdf(vals, probs, min=None, max=None):
     return vals, probs
 
 
-def pdf_from_samples(samples, n=100, x_min=None, x_max=None, cut=None):
-    _kde = gaussian_kde(samples)
+def pdf_from_samples(samples, n=100, x_min=None, x_max=None, cut=None, 
+                     bw=None):
+
+    _kde = gaussian_kde(samples, bw_method=bw)
 
     if cut == None:
         bw = _kde.factor
@@ -73,6 +80,35 @@ def pdf_from_samples(samples, n=100, x_min=None, x_max=None, cut=None):
     px /= np.trapz(px, support) # possibly replace w/ normalize_pdf
 
     return support, px
+
+
+def Pdf(x, y):
+    _pdf = interp1d(x, y, bounds_error=False, fill_value=0.)
+    return _pdf
+
+
+def multiply_pdfs(p1x, p1y, p2x, p2y, step=None, n_interp=1000):
+    p1_xmin = np.min(p1x)
+    p2_xmin = np.min(p2x)
+    p1_xmax = np.max(p1x)
+    p2_xmax = np.max(p2x)
+    
+    p_xmin = min(p1_xmin, p2_xmin)
+    p_xmax = max(p1_xmax, p2_xmax)
+    
+    if step is None:
+        support = np.linspace(p_xmin, p_xmax, num=n_interp)
+    else:
+        support = np.arange(p_xmin, p_xmax+step, step)
+        
+    p1 = Pdf(p1x, p1y)(support)
+    p2 = Pdf(p2x, p2y)(support)
+    
+    p = p1 * p2
+    
+    p = p / np.trapz(p, support)
+    
+    return support, p
 
 
 # sampling

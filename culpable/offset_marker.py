@@ -5,7 +5,7 @@ import attr
 from attr.validators import instance_of, optional
 
 from .stats import (inverse_transform_sample, sample_from_bounded_normal,
-                    pdf_from_samples)
+                    pdf_from_samples, trim_pdf)
 from .fault_projections import *
 
 def opt(convert):
@@ -328,6 +328,41 @@ class OffsetMarker(object):
                                validator=validate_dist_type)
 
     #TODO: add trend
+
+
+    #####
+    # misc methods
+    #####
+    def trim_ages(self, min=None, max=None):
+        # TODO: Make some logic for non-arbitrary distributions
+
+        if self.age_dist_type == 'arbitrary':
+            self.age, self.age_err = trim_pdf(self.age, self.age_err, min, max)
+            self.ages.vals, self.ages.probs = self.age, self.age_err
+
+        elif self.age_dist_type == 'uniform':
+            age_min = self.age - self.age_err
+            age_max = self.age + self.age_err
+
+            if min is not None:
+            
+                if age_min < min:
+                    age_min = min
+
+            if max is not None:
+                if age_max > max:
+                    age_max = max
+
+            age_mean = (age_min + age_max) / 2
+            age_err = age_mean - age_min
+
+            self.age = age_mean
+            self.age_err = age_err
+            self.ages = Age(min=age_min,
+                            max=age_max,
+                            units=self.age_units,
+                            dist_type='uniform')
+
     
     #####
     # attribute class initializations

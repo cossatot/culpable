@@ -11,13 +11,17 @@ from attr.validators import instance_of, optional
 
 from .stats import inverse_transform_sample
 
+
+
+# time-dependent EQ stuff
 @attr.s
 class RecKDE(object):
     # consider generalizing this w/ kde in stats module,
     # or using scipy gaussian_kde to remove statsmodels dependency
 
-    data = attr.ib(default=attr.Factory(np.array), convert=np.array,
-                   validator=instance_of(np.array))
+    data = attr.ib(default=attr.Factory(np.array), #convert=np.array,
+                   #validator=instance_of(np.array)
+                   )
     
     def fit(self, x_min = 0., **kwargs):
 
@@ -67,7 +71,7 @@ def mean_recurrence_interval(t, rec_pdf):
     return np.trapz(S(t, rec_pdf), t)
 
 
-### stuff to bring in from old eq_recurrence.py
+### Earthquake recurrence PDFs
 def sample_eq_pdf(row, n_samps):
     #q_vals, eq_probs = make_eq_pdfs(row['age_5'], row['age_mean'], 
     #                                 row['age_95'])
@@ -78,6 +82,10 @@ def sample_eq_pdf(row, n_samps):
 
     raise NotImplementedError
 
+
+
+def sample_eq_history():
+    pass
 
 def make_eq_time_series(eq_list, n_samples):
     # need to implement sample_eq_pdf first
