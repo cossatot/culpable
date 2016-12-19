@@ -637,7 +637,7 @@ class OffsetMarker(object):
             are scalar.
         '''
         if not hasattr(self, 'rakes'):
-            _init_rake(self)
+            self._init_rake(self)
         return self.rakes.sample(n, return_scalar_array)
 
     def sample_dips(self, n, return_scalar_array=True):
@@ -654,7 +654,7 @@ class OffsetMarker(object):
             are scalar.
         '''
         if not hasattr(self, 'dips'):
-            _init_dip(self)
+            self._init_dip(self)
         return self.dips.sample(n, return_scalar_array)
     
     def sample_ages(self, n, return_scalar_array=True):
@@ -671,7 +671,7 @@ class OffsetMarker(object):
             are scalar.
         '''
         if not hasattr(self, 'ages'):
-            _init_age(self)
+            self._init_age(self)
         return self.ages.sample(n, return_scalar_array)
 
     def sample_offsets(self, n, return_scalar_array=True):
@@ -688,7 +688,7 @@ class OffsetMarker(object):
             are scalar.
         '''
         if not self.offsets:
-            _init_offset(self)
+            self._init_offset(self)
         return self.offsets.sample(n, return_scalar_array)
 
     def sample_vert_separations(self, n, return_scalar_array=True):
