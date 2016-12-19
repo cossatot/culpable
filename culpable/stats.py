@@ -1,67 +1,65 @@
 import numpy as np
 from scipy.interpolate import interp1d
-from scipy.integrate import trapz, cumtrapz
+from scipy.integrate import cumtrapz
 from scipy.stats import gaussian_kde
 
 # basic pdf stuff
-def make_pdf(vals, probs, n_interp=1000):
-    """
-    Takes a sequence of x (values) and p(x) (probs) and makes a PDF
-    """
-    
-    val_min = np.min(vals)
-    val_max = np.max(vals)
-    
-    # if the PDF is just a point (no uncertainty)
-    if val_min == val_max: 
-        return val_min, 1.
-    
-    # if not...
+
+def normalize_pmf(x, px):
+
+    if x[0] > x[1]:
+        px_norm = px / np.trapz(px[::-1], x[::-1])
     else:
-        pdf_range = np.linspace(val_min, val_max, n_interp)
+        px_norm = px / np.trapz(px, x)
 
-        pmf = interp1d(vals, probs)
-        pmf_samples = pmf(pdf_range)
-        pdf_probs = pmf_samples / np.sum(pmf_samples) # normalize
-
-    return pdf_range, pdf_probs
+    return x, px_norm
 
 
-def make_cdf(pdf_range, pdf_probs):
-    """ Makes a CDF from a PDF """
-    return (pdf_range, np.cumsum(pdf_probs))
+def Pdf(x, px, normalize=True):
+    """docstring"""
+    if np.isscalar(x):
+        def _pdf(interp_x, x):
+            if interp_x == x:
+                return 1.
+            else:
+                return 0.
 
-
-def pdf_mean(pdf_vals, pdf_probs):
-    return trapz(pdf_vals * pdf_probs, pdf_vals)
-
-
-def normalize_pmf(vals, probs):
-
-    if vals[0] > vals[1]: 
-        probs_norm = probs / np.trapz(probs[::-1], vals[::-1])
     else:
-        probs_norm = probs / np.trapz(probs, vals)
- 
-    return vals, probs_norm
+        if normalize == True:
+            x, px = normalize_pmf(x, px)
+
+        _pdf = interp1d(x, px, bounds_error=False, fill_value=0.)
+    return _pdf
 
 
-def trim_pdf(vals, probs, min=None, max=None):
+def Cdf(x, px, normalize=True):
+    """docstring"""
+    _cdf = interp1d(x, cumtrapz(px, initial=0.), fill_value=1.,
+                    bounds_error=False)
+
+    return _cdf
+
+
+def pdf_mean(x, px):
+    return np.trapz(x * px, x)
+
+
+def trim_pdf(x, px, min=None, max=None):
 
     if min is not None:
-        probs = probs[vals >= min]
-        vals = vals[vals >= min] # vals last b/c it gets trimmed
+        px = px[x >= min]
+        x = x[x >= min] # vals last b/c it gets trimmed
     
     if max is not None:
-        probs = probs[vals <= max]
-        vals = vals[vals <= max] # vals last b/c it gets trimmed
+        px = px[x <= max]
+        x = x[x <= max] # vals last b/c it gets trimmed
 
-    vals, probs = normalize_pmf(vals, probs)
-    return vals, probs
+    x, px = normalize_pmf(x, px)
+    return x, px
 
 
 def pdf_from_samples(samples, n=100, x_min=None, x_max=None, cut=None, 
-                     bw=None):
+                     bw=None, return_arrays=False):
 
     _kde = gaussian_kde(samples, bw_method=bw)
 
@@ -75,56 +73,50 @@ def pdf_from_samples(samples, n=100, x_min=None, x_max=None, cut=None,
     if x_max == None:
         x_max = np.max(samples) + cut
 
-    support = np.linspace(x_min, x_max, n)
-    px = _kde.evaluate(support)
-    px /= np.trapz(px, support) # possibly replace w/ normalize_pdf
+    x = np.linspace(x_min, x_max, n)
+    px = _kde.evaluate(x)
 
-    return support, px
+    pdf = Pdf(x, px)
+
+    if return_arrays == True:
+        return x, px
+    else:
+        return pdf
 
 
-def Pdf(x, y):
-    _pdf = interp1d(x, y, bounds_error=False, fill_value=0.)
-    return _pdf
-
-
-def multiply_pdfs(p1x, p1y, p2x, p2y, step=None, n_interp=1000):
-    p1_xmin = np.min(p1x)
-    p2_xmin = np.min(p2x)
-    p1_xmax = np.max(p1x)
-    p2_xmax = np.max(p2x)
+def multiply_pdfs(p1, p2, step=None, n_interp=1000):
+    x1_min = np.min(p1.x)
+    x2_min = np.min(p2.x)
+    x1_max = np.max(p1.x)
+    x2_max = np.max(p2.x)
     
-    p_xmin = min(p1_xmin, p2_xmin)
-    p_xmax = max(p1_xmax, p2_xmax)
+    x_min = min(x1_min, x2_min)
+    x_max = max(x1_max, x2_max)
     
     if step is None:
-        support = np.linspace(p_xmin, p_xmax, num=n_interp)
+        x = np.linspace(x_min, x_max, num=n_interp)
     else:
-        support = np.arange(p_xmin, p_xmax+step, step)
+        x = np.arange(x_min, x_max+step, step)
         
-    p1 = Pdf(p1x, p1y)(support)
-    p2 = Pdf(p2x, p2y)(support)
-    
-    p = p1 * p2
-    
-    p = p / np.trapz(p, support)
-    
-    return support, p
+    px = p1(x) * p2(x)
+
+    return Pdf(x, px)
 
 
 # sampling
-def inverse_transform_sample(vals, probs, n_samps, n_interp=1000):
+def inverse_transform_sample(x, px, n_samps):
     """
-    
+    lots o' docs
     """
-    pdf_range, pdf_probs = make_pdf(vals, probs, n_interp)
-    cdf_range, cdf_probs = make_cdf(pdf_range, pdf_probs)
+    if len(x) == 1:
+        return np.ones(n_samps) * px
 
-    if len(cdf_probs) == 1:
-        return np.ones(n_samps) * pdf_range
-    
     else:
-        cdf_interp = interp1d(cdf_probs, cdf_range, bounds_error=False,
-                          fill_value=0.)
+        cdf = Cdf(x, px)
+
+        cdf_interp = interp1d(cdf(x), x, bounds_error=False,
+                              fill_value=0.)
+
         samps = np.random.rand(n_samps)
 
         return cdf_interp(samps)
