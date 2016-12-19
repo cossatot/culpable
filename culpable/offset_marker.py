@@ -819,13 +819,13 @@ class OffsetMarker(object):
         if component == 'offset':
             offset_sample = self.sample_offsets(n, return_scalar_array)
         elif component == 'vert_separation':
-            offset_sample = self.sample_vert_separation(n, return_scalar_array)
+            offset_sample = self.sample_vert_separations(n, return_scalar_array)
         elif component == 'hor_separation':
-            offset_sample = self.sample_hor_separation(n, return_scalar_array)
+            offset_sample = self.sample_hor_separations(n, return_scalar_array)
         elif component == 'dip_slip':
-            offset_sample = self.sample_dip_slip(n, return_scalar_array)
+            offset_sample = self.sample_dip_slips(n, return_scalar_array)
         elif component == 'strike_slip':
-            offset_sample = self.sample_strike_slip(n, return_scalar_array)
+            offset_sample = self.sample_strike_slips(n, return_scalar_array)
         else:
             raise NameError('{} not acceptable slip component'
                             .format(component))
