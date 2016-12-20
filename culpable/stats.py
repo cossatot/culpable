@@ -8,9 +8,13 @@ from scipy.stats import gaussian_kde
 def normalize_pmf(x, px):
 
     if x[0] > x[1]:
-        px_norm = px / np.trapz(px[::-1], x[::-1])
+        denom = np.trapz(px[::-1], x[::-1])
     else:
-        px_norm = px / np.trapz(px, x)
+        denom = np.trapz(px, x)
+
+    if denom != 0.:
+        px_norm = px / denom
+    else: px_norm = px * 0.
 
     return x, px_norm
 
