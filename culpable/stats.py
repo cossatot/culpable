@@ -34,8 +34,8 @@ def Pdf(x, px, normalize=True):
 
 def Cdf(x, px, normalize=True):
     """docstring"""
-    _cdf = interp1d(x, cumtrapz(px, initial=0.), fill_value=1.,
-                    bounds_error=False)
+    _cdf = interp1d(x, cumtrapz(px, initial=0.) / np.sum(px), 
+                    fill_value=1., bounds_error=False)
 
     return _cdf
 
@@ -79,7 +79,7 @@ def pdf_from_samples(samples, n=100, x_min=None, x_max=None, cut=None,
     pdf = Pdf(x, px)
 
     if return_arrays == True:
-        return x, px
+        return pdf.x, pdf.y
     else:
         return pdf
 
@@ -101,6 +101,28 @@ def multiply_pdfs(p1, p2, step=None, n_interp=1000):
     px = p1(x) * p2(x)
 
     return Pdf(x, px)
+
+
+def divide_pdfs(p1, p2, step=None, n_interp=1000):
+    x1_min = np.min(p1.x)
+    x2_min = np.min(p2.x)
+    x1_max = np.max(p1.x)
+    x2_max = np.max(p2.x)
+    
+    x_min = min(x1_min, x2_min)
+    x_max = max(x1_max, x2_max)
+    
+    if step is None:
+        x = np.linspace(x_min, x_max, num=n_interp)
+    else:
+        x = np.arange(x_min, x_max+step, step)
+        
+    
+    px = p1(x) / p2(x)
+
+    return Pdf(x, px)
+
+
 
 
 # sampling
