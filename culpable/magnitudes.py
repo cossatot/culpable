@@ -313,7 +313,7 @@ def M_from_L(L, ref='wc', unit='km', a=None, a_err=None, b=None, b_err=None,
 
     if mc == True:
         A = a if a_err is None else np.random.normal(a, a_err, len(L))
-        B = b if b_err is None else np.random.normal(a, b_err, len(L))
+        B = b if b_err is None else np.random.normal(b, b_err, len(L))
     else:
         A = a
         B = b
@@ -322,7 +322,6 @@ def M_from_L(L, ref='wc', unit='km', a=None, a_err=None, b=None, b_err=None,
     if log == 'e':
         return A + B * np.log(L)
     elif log in ('10', 10):
-        print('log10')
         return A + B * np.log10(L)
     
     else:
