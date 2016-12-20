@@ -614,7 +614,8 @@ class OffsetMarker(object):
                                              dist_type='scalar')
             else:
 
-                off_vals, off_probs = pdf_from_samples(off_samples)
+                off_vals, off_probs = pdf_from_samples(off_samples,
+                                                       return_arrays=True)
 
                 self.offsets = SlipComponent(mean=np.mean(off_samples),
                                              vals=off_vals,
