@@ -51,14 +51,19 @@ def validate_dist_type(instance, age_dist_type, value):
             "{} not acceptable unit; only {}".format(value,
                                                acceptable_distribution_types))
 
-def validate_dip_rake(instance, attribute, value):
+def validate_dip(instance, attribute, value):
     if (value < 0.) or (value > 90.):
         raise ValueError("Only angles between 0 and 90 acceptable")
 
 
 def validate_strike(instance, attribute, value):
     if (value < 0.) or (value > 360.):
-        raise ValueError("Only angles between 0 and 90 acceptable")
+        raise ValueError("Only angles between 0 and 360 acceptable")
+
+
+def validate_rake(instance, attribute, value):
+    if (value <= -180.) or (value > 360.):
+        raise ValueError("Only angles between 0 and 360 acceptable")
 
 
 def validate_angle(instance, attribute, value):
@@ -306,11 +311,11 @@ class OffsetMarker(object):
     # dip stuff
     dip = attr.ib(default=None, 
                   convert=opt(np.float_),
-                  validator=optional(validate_dip_rake))
+                  validator=optional(validate_dip))
     
     dip_err = attr.ib(default=None, 
                       convert=opt(np.float_),
-                      validator=optional(validate_dip_rake))
+                      validator=optional(validate_dip))
 
     dip_dist_type = attr.ib(default='unspecified',
                                validator=validate_dist_type)
@@ -318,11 +323,11 @@ class OffsetMarker(object):
     # rake stuff
     rake = attr.ib(default=None, 
                    convert=opt(np.float_),
-                   validator=optional(validate_dip_rake))
+                   validator=optional(validate_rake))
     
     rake_err = attr.ib(default=None, 
                        convert=opt(np.float_),
-                       validator=optional(validate_dip_rake))
+                       validator=optional(validate_rake))
 
     rake_dist_type = attr.ib(default='unspecified',
                                validator=validate_dist_type)
