@@ -63,7 +63,7 @@ def trim_pdf(x, px, min=None, max=None):
 
 
 def pdf_from_samples(samples, n=100, x_min=None, x_max=None, cut=None, 
-                     bw=None, return_arrays=False):
+                     bw=None, return_arrays=False, close=True):
 
     _kde = gaussian_kde(samples, bw_method=bw)
 
@@ -79,6 +79,10 @@ def pdf_from_samples(samples, n=100, x_min=None, x_max=None, cut=None,
 
     x = np.linspace(x_min, x_max, n)
     px = _kde.evaluate(x)
+
+    if close == True:
+        px[0] = 0.
+        px[-1] = 0.
 
     pdf = Pdf(x, px)
 
