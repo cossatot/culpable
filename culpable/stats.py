@@ -138,7 +138,7 @@ def inverse_transform_sample(x, px, n_samps):
     """
     lots o' docs
     """
-    if len(x) == 1:
+    if np.isscalar(x) == 1:
         return np.ones(n_samps) * px
 
     else:
