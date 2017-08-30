@@ -20,15 +20,46 @@ def normalize_pmf(x, px):
 
 
 
-#class _Pdf(interp1d):
-#    def __init__(self, x, px):
+class _Pdf(interp1d):
+    def __init__(self, x, px, bounds_error=False, fill_value=0):
+        super(_Pdf, self).__init__(x, px, bounds_error=bounds_error,
+                                   fill_value=fill_value)
+        self.cdf = Cdf(x, px)
+        self.icdf = Icdf(x, px)
+
+    def max(self):
+        y_max = np.max(self.y)
+        x_max = self.x[np.argmax(self.y)]
+        return (x_max, y_max)
+
+    def min(self):
+        y_min = np.min(self.y)
+        x_min = self.x[np.argmin(self.y)]
+        return (x_min, y_min)
+
+    def mean(self):
+        return pdf_mean(self.x, self.y)
+
+    def score_at_percentile(self, pctile):
+        """pctile should be a decimal (between 0. and 1.)"""
+
+        return self.icdf(pctile)
+
+    def median(self):
+        return self.score_at_percentile(0.5)
 
 
 
 def Pdf(x, px, normalize=True):
     """docstring"""
-    if np.isscalar(x):
-        class _Pdf(object):
+    if not np.isscalar(x):
+        if normalize == True:
+            x, px = normalize_pmf(x, px)
+
+        _pdf = _Pdf(x, px, bounds_error=False, fill_value=0.)
+
+    else:
+        class DeltaPdf(object):
             def __init__(self, x):
                  self.x = x
             def __call__(val):
@@ -36,22 +67,32 @@ def Pdf(x, px, normalize=True):
                     return 1.
                  else:
                     return 0.
+        _pdf = DeltaPdf(x)
 
-    else:
-        if normalize == True:
-            x, px = normalize_pmf(x, px)
-
-        _Pdf = interp1d(x, px, bounds_error=False, fill_value=0.)
-    return _Pdf
+    return _pdf
 
 
 def Cdf(x, px, normalize=True):
     """docstring"""
+
+    if normalize == True:
+        x, px = normalize_pmf(x, px)
+
     _cdf = interp1d(x, cumtrapz(px, initial=0.) / np.sum(px), 
                     fill_value=1., bounds_error=False)
 
     return _cdf
 
+
+def Icdf(x, px, normalize=True):
+
+    if normalize == True:
+        x, px = normalize_pmf(x, px)
+
+    _icdf = interp1d(cumtrapz(px, initial=0.) / np.sum(px), x,
+                    fill_value=1., bounds_error=False)
+
+    return _icdf
 
 def pdf_mean(x, px):
     return np.trapz(x * px, x)

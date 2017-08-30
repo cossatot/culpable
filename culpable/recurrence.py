@@ -3,7 +3,6 @@ import numpy as np
 
 from scipy.interpolate import interp1d
 from scipy.integrate import trapz, cumtrapz
-from statsmodels.nonparametric.kde import KDEUnivariate
 
 
 import attr
@@ -14,22 +13,10 @@ from .stats import inverse_transform_sample, pdf_from_samples, Pdf, Cdf
 
 
 # time-dependent EQ stuff
-@attr.s
-class RecKDE(object):
-    # consider generalizing this w/ kde in stats module,
-    # or using scipy gaussian_kde to remove statsmodels dependency
 
-    data = attr.ib(default=attr.Factory(np.array), #convert=np.array,
-                   #validator=instance_of(np.array)
-                   )
+def RecKDE(data):
+    return pdf_from_samples(data, x_min=0, close=False)
 
-    def __attrs_post_init__(self):
-        #self.x, self.y = pdf_from_samples(self.data, x_min=0, close=False,
-        #                                  return_arrays=True)
-        self = pdf_from_samples(self.data, x_min=0, close=False)
-        self.px = self.y
-
-    
     
 def pdf(t, rec_pdf):
     pdf_ = interp1d(rec_pdf.x, rec_pdf.px, kind='linear',
