@@ -32,11 +32,6 @@ class _Pdf(interp1d):
         x_max = self.x[np.argmax(self.y)]
         return (x_max, y_max)
 
-    def min(self):
-        y_min = np.min(self.y)
-        x_min = self.x[np.argmin(self.y)]
-        return (x_min, y_min)
-
     def mean(self):
         return pdf_mean(self.x, self.y)
 
