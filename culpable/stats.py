@@ -27,7 +27,7 @@ class _Pdf(interp1d):
         self.cdf = Cdf(x, px)
         self.icdf = Icdf(x, px)
 
-    def max(self):
+    def mode(self):
         y_max = np.max(self.y)
         x_max = self.x[np.argmax(self.y)]
         return (x_max, y_max)
