@@ -19,21 +19,30 @@ def normalize_pmf(x, px):
     return x, px_norm
 
 
+
+#class _Pdf(interp1d):
+#    def __init__(self, x, px):
+
+
+
 def Pdf(x, px, normalize=True):
     """docstring"""
     if np.isscalar(x):
-        def _pdf(interp_x, x):
-            if interp_x == x:
-                return 1.
-            else:
-                return 0.
+        class _Pdf(object):
+            def __init__(self, x):
+                 self.x = x
+            def __call__(val):
+                 if val == self.x:
+                    return 1.
+                 else:
+                    return 0.
 
     else:
         if normalize == True:
             x, px = normalize_pmf(x, px)
 
-        _pdf = interp1d(x, px, bounds_error=False, fill_value=0.)
-    return _pdf
+        _Pdf = interp1d(x, px, bounds_error=False, fill_value=0.)
+    return _Pdf
 
 
 def Cdf(x, px, normalize=True):
@@ -62,7 +71,7 @@ def trim_pdf(x, px, min=None, max=None):
     return x, px
 
 
-def pdf_from_samples(samples, n=100, x_min=None, x_max=None, cut=None, 
+def pdf_from_samples(samples, n=1000, x_min=None, x_max=None, cut=None, 
                      bw=None, return_arrays=False, close=True):
 
     _kde = gaussian_kde(samples, bw_method=bw)
