@@ -74,6 +74,24 @@ Dn = Pdf(Dn_x, Dn_y)
 
 
 """
+Probability distribution for an earthquake breaking the surface given
+Gutenberg-Richter prior; to be used as a p(M) prior for paleoseismic magnitudes
+from Biasi and Weldon 2006
+"""
+
+gr_pm_x = [5.000, 5.001, 5.057, 5.097, 5.192, 5.300, 5.392, 5.499, 5.597,
+           5.753, 5.922, 6.021, 6.211, 6.353, 6.533, 6.604, 6.771, 6.999,
+           7.280, 7.507, 7.726, 7.953, 8.182]
+
+
+gr_pm_y = [0.000, 0.030, 0.050, 0.063, 0.081, 0.089, 0.089, 0.085, 0.079,
+           0.067, 0.054, 0.047, 0.035, 0.027, 0.020, 0.018, 0.013, 0.008,
+           0.005, 0.003, 0.002, 9.785e-4, 0.00]
+
+
+
+
+"""
 Conversion functions
 """
 
@@ -379,7 +397,11 @@ def p_D_M(D, M, ref='bw', **kwargs):
     return p_D_M
 
 
-def make_p_M(p_M_min=6., p_M_max=8., M_step=0.1, n_M=None):
+
+def make_p_M_x(p_M_min=5., p_M_max=8.5, M_step=0.1, n_M=None):
+    """
+    dox
+    """
     
     if n_M is not None:
         p_M_x = np.linspace(p_M_min, p_M_max, num=n_M)
@@ -389,19 +411,79 @@ def make_p_M(p_M_min=6., p_M_max=8., M_step=0.1, n_M=None):
             M_step = 0.1 # in case it's passed as None from another function
         p_M_x = np.arange(p_M_min, p_M_max + M_step, M_step)
 
-    return Pdf(p_M_x, np.ones(len(p_M_x)) * 1 / len(p_M_x))
-    
+    return p_M_x
 
-def p_M_D(D, p_M=None, p_M_min=None, p_M_max=None, M_step=None, n_M=None,
-          ref='bw', **kwargs):
+
+def make_p_M_uniform(p_M_min=5., p_M_max=8.5, M_step=0.1, n_M=None):
+    """
+    Creates a uniform PDF between the minimum and maximum magnitudes given
+    by p_M_min and p_M_max.
+
+    Parameters
+    ----------
+    p_M_min : Minimum magnitude.
+    p_M_max : Maximum magnitude.
+    M_step : Width of steps in interpolation (no effect on final results).
+    n_M : number of points in interpolation (no effect on final results).
+
+    Returns
+    -------
+    p_M : Pdf function with a uniform distribution between p_M_min and p_M_max
 
     """
-    Calculates earthquake magnitude given displacement
+    p_M_x = make_p_M_x(p_M_min=p_M_min, p_M_max=p_M_max, M_step=M_step, 
+                       n_M=n_M)
+
+    return Pdf(p_M_x, np.ones(len(p_M_x)) * 1 / len(p_M_x))
+
+
+def make_p_M_gr_surface_break(p_M_min=5., p_M_max=8.5, M_step=0.1, n_M=None):
+    """
+    Creates a PDF based on a Gutenberg-Richter distribution that is then
+    modified to account for the decreasing likelihood of surface rupture
+    with decreasing magnitude (distribution from Biasi and Weldon 2006,
+    figure 8b.
+
+    Returns:
+    --------
+    p_M : Pdf class with a modified Gutenberg-Richter distribution.
+
+    """
+    p_M_x = make_p_M_x(p_M_min=p_M_min, p_M_max=p_M_max, M_step=M_step, 
+                       n_M=n_M)
+
+    p_M_gr_sb = Pdf(gr_pm_x, gr_pm_y)
+
+    p_M_gr_sb_y = p_M_gr_sb(p_M_x)
+
+    return Pdf(p_M_x, p_M_gr_sb_y)
+   
+
+def make_p_M(p_M_type='uniform', p_M_min=None, p_M_max=None, M_step=None, 
+             n_M=None):
+    """Docstring"""
+
+    if p_M_type == 'uniform':
+        p_M = make_p_M_uniform(p_M_min=p_M_min, p_M_max=p_M_max,
+                               M_step=M_step, n_M=n_M)
+
+    elif p_M_type == 'GR_surface_break':
+        p_M = make_p_M_gr_surface_break(p_M_min=p_M_min, p_M_max=p_M_max,
+                                        M_step=M_step, n_M=n_M)
+
+    return p_M
+
+
+def p_M_D(D, p_M=None, p_M_min=None, p_M_max=None, M_step=None, n_M=None,
+          ref='bw', p_M_type='uniform', **kwargs):
+
+    """
+    Calculates earthquake magnitude given displacement.
     """
 
     if p_M is None:
-       p_M = make_p_M(p_M_min, p_M_max, M_step, n_M)
-
+        p_M = make_p_M(p_M_type=p_M_type, p_M_min=p_M_min, p_M_max=p_M_max,
+                       M_step=M_step, n_M=n_M)
     else:
         #TODO: maybe add some logic for dealing with non `Pdf` priors
         pass
@@ -419,11 +501,11 @@ def p_M_D(D, p_M=None, p_M_min=None, p_M_max=None, M_step=None, n_M=None,
 
 
 def p_M_L(L, p_M=None, p_M_min=None, p_M_max=None, M_step=None, n_M=None,
-          ref='wc', mc=True, **kwargs):
+          p_M_type='uniform', ref='wc', mc=True, **kwargs):
 
     if p_M is None:
-        p_M = make_p_M(p_M_min, p_M_max, M_step, n_M)
-
+        p_M = make_p_M(p_M_type=p_M_type, p_M_min=p_M_min, p_M_max=p_M_max,
+                       M_step=M_step, n_M=n_M)
 
     p_M_L_samples = M_from_L(L, ref=ref, mc=mc, **kwargs)
 
@@ -436,10 +518,11 @@ def p_M_L(L, p_M=None, p_M_min=None, p_M_max=None, M_step=None, n_M=None,
 
 
 def p_M_DL(D, L, p_M=None, p_M_min=None, p_M_max=None, M_step=None, n_M=None,
-           ref='wc', L_mc=True, **kwargs):
+           p_M_type='uniform', ref='wc', L_mc=True, **kwargs):
     
     if p_M is None:
-        p_M = make_p_M(p_M_min, p_M_max, M_step, n_M)
+        p_M = make_p_M(p_M_type=p_M_type, p_M_min=p_M_min, p_M_max=p_M_max,
+                       M_step=M_step, n_M=n_M)
 
     p_M_D_ = p_M_D(D, p_M, ref=ref, **kwargs)
 

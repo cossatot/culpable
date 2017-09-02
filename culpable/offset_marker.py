@@ -1,5 +1,6 @@
 from collections import namedtuple
 import numpy as np
+np.random.seed(69)
 
 import attr
 from attr.validators import instance_of, optional
