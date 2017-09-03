@@ -24,8 +24,8 @@ class _Pdf(interp1d):
     def __init__(self, x, px, bounds_error=False, fill_value=0):
         super(_Pdf, self).__init__(x, px, bounds_error=bounds_error,
                                    fill_value=fill_value)
-        self.cdf = Cdf(x, px)
-        self.icdf = Icdf(x, px)
+        self.cdf = Cdf(x, px, normalize=False)
+        self.icdf = Icdf(x, px, normalize=False)
 
     def mode(self):
         y_max = np.max(self.y)
@@ -50,19 +50,14 @@ def Pdf(x, px, normalize=True):
     if not np.isscalar(x):
         if normalize == True:
             x, px = normalize_pmf(x, px)
-
-        _pdf = _Pdf(x, px, bounds_error=False, fill_value=0.)
-
+    
     else:
-        class DeltaPdf(object):
-            def __init__(self, x):
-                 self.x = x
-            def __call__(val):
-                 if val == self.x:
-                    return 1.
-                 else:
-                    return 0.
-        _pdf = DeltaPdf(x)
+        eps = np.finfo(float).eps
+
+        x = [x-eps, x, x+eps]
+        px = [0., 1., 0.]
+
+    _pdf = _Pdf(x, px, bounds_error=False, fill_value=0.)
 
     return _pdf
 
@@ -110,24 +105,29 @@ def trim_pdf(x, px, min=None, max=None):
 def pdf_from_samples(samples, n=1000, x_min=None, x_max=None, cut=None, 
                      bw=None, return_arrays=False, close=True):
 
-    _kde = gaussian_kde(samples, bw_method=bw)
+    if np.all(samples == samples[0]):
+        x = samples[0]
+        px = 1.
 
-    if cut == None:
-        bw = _kde.factor
-        cut = 3 * bw
-    
-    if x_min == None:
-        x_min = np.min(samples) - cut
+    else:
+        _kde = gaussian_kde(samples, bw_method=bw)
 
-    if x_max == None:
-        x_max = np.max(samples) + cut
+        if cut == None:
+            bw = _kde.factor
+            cut = 3 * bw
+        
+        if x_min == None:
+            x_min = np.min(samples) - cut
 
-    x = np.linspace(x_min, x_max, n)
-    px = _kde.evaluate(x)
+        if x_max == None:
+            x_max = np.max(samples) + cut
 
-    if close == True:
-        px[0] = 0.
-        px[-1] = 0.
+        x = np.linspace(x_min, x_max, n)
+        px = _kde.evaluate(x)
+
+        if close == True:
+            px[0] = 0.
+            px[-1] = 0.
 
     pdf = Pdf(x, px)
 

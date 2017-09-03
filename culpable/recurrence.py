@@ -14,29 +14,18 @@ from .stats import inverse_transform_sample, pdf_from_samples, Pdf, Cdf
 
 # time-dependent EQ stuff
 
-def RecKDE(data):
+def RecKDE(data, data_type='samples'):
+    # TODO: Make it work for more types of PDFs/input data
     return pdf_from_samples(data, x_min=0, close=False)
 
-    
-def pdf(t, rec_pdf):
-    pdf_ = interp1d(rec_pdf.x, rec_pdf.px, kind='linear',
-                    bounds_error=False, fill_value=0.)
-    return pdf_(t)
-
-
-def cdf(t, rec_pdf):
-    cdf_ = interp1d(rec_pdf.x, 
-                    cumtrapz(rec_pdf.px, rec_pdf.x, initial=0.),
-                    kind='linear', bounds_error=False, fill_value=1.)
-    return cdf_(t)
-
-
+ 
 def S(t, rec_pdf):
-    return 1 - cdf(t, rec_pdf)
+    return 1 - rec_pdf.cdf(t)
 
 
 def hazard(t, rec_pdf):
-    return pdf(t, rec_pdf) / S(t, rec_pdf)
+    #return pdf(t, rec_pdf) / S(t, rec_pdf)
+    return rec_pdf(t) / S(t, rec_pdf)
 
 
 def mean_recurrence_interval(t, rec_pdf):
