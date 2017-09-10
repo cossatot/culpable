@@ -33,7 +33,10 @@ class _Pdf(interp1d):
         return (x_max, y_max)
 
     def mean(self):
-        return pdf_mean(self.x, self.y)
+        if self.y[1] == 1.: # if delta fn
+            return self.x[1]
+        else:
+            return pdf_mean(self.x, self.y)
 
     def score_at_percentile(self, pctile):
         """pctile should be a decimal (between 0. and 1.)"""
@@ -52,7 +55,7 @@ def Pdf(x, px, normalize=True):
             x, px = normalize_pmf(x, px)
     
     else:
-        eps = np.finfo(float).eps
+        eps = 1e-15 # real eps doesn't work for out purposes
 
         x = [x-eps, x, x+eps]
         px = [0., 1., 0.]
