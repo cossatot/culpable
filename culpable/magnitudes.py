@@ -73,6 +73,13 @@ Dn_y = np.array(
 Dn = Pdf(Dn_x, Dn_y)
 
 
+
+
+Dn_sb = multiply_pdfs(Dn, Pdf([Dn_x.min(), Dn_x.max()], 
+                              [Dn_x.min(), Dn_x.max()]))
+
+
+
 """
 Probability distribution for an earthquake breaking the surface given
 Gutenberg-Richter prior; to be used as a p(M) prior for paleoseismic magnitudes
@@ -350,7 +357,7 @@ def M_from_L(L, ref='wc', unit='km', a=None, a_err=None, b=None, b_err=None,
 Estimation functions
 """
 
-def p_D_M(D, M, ref='bw', **kwargs):
+def p_D_M(D, M, ref='bw', sample_bias_corr=False):
     """
     Likelihood of predicted D given M, as defined by Biasi and Weldon (2006).
 
@@ -374,18 +381,23 @@ def p_D_M(D, M, ref='bw', **kwargs):
 
     """
 
-    D_ave = D_from_M(M, ref=ref, **kwargs)
+    D_ave = D_from_M(M, ref=ref)
 
     D = np.abs(D)
 
+    if sample_bias_corr == True:
+        Dn_ = Dn_sb
+    else:
+        Dn_ = Dn
+
     if np.isscalar(D):
         D_score = D / D_ave 
-        p_D_M =  Dn(D_score)
+        p_D_M = Dn_(D_score)
         
     else:
         D_score = np.array([d / D_ave for d in D])
 
-        p_D_M = Dn(D_score)
+        p_D_M = Dn_(D_score)
         p_D_M = np.mean(p_D_M, axis=0)
 
     if np.isscalar(p_D_M):
@@ -475,7 +487,7 @@ def make_p_M(p_M_type='uniform', p_M_min=None, p_M_max=None, M_step=None,
 
 
 def p_M_D(D, p_M=None, p_M_min=None, p_M_max=None, M_step=None, n_M=None,
-          ref='bw', p_M_type='uniform', **kwargs):
+          ref='bw', p_M_type='uniform', sample_bias_corr=False):
 
     """
     Calculates earthquake magnitude given displacement.
@@ -488,10 +500,10 @@ def p_M_D(D, p_M=None, p_M_min=None, p_M_max=None, M_step=None, n_M=None,
         #TODO: maybe add some logic for dealing with non `Pdf` priors
         pass
 
-    p_D = np.array([np.trapz(Dn_y, Dn_x * D_from_M(M, ref=ref, **kwargs))
+    p_D = np.array([np.trapz(Dn_y, Dn_x * D_from_M(M, ref=ref))
                     for M in p_M.x])
 
-    p_D_M_ = p_D_M(D, p_M.x, ref=ref, **kwargs)
+    p_D_M_ = p_D_M(D, p_M.x, ref=ref, sample_bias_corr=sample_bias_corr)
 
     p_M_D_ = p_M.y * p_D_M_.y / p_D
 
@@ -501,13 +513,13 @@ def p_M_D(D, p_M=None, p_M_min=None, p_M_max=None, M_step=None, n_M=None,
 
 
 def p_M_L(L, p_M=None, p_M_min=None, p_M_max=None, M_step=None, n_M=None,
-          p_M_type='uniform', ref='wc', mc=True, **kwargs):
+          p_M_type='uniform', ref='wc', mc=True):
 
     if p_M is None:
         p_M = make_p_M(p_M_type=p_M_type, p_M_min=p_M_min, p_M_max=p_M_max,
                        M_step=M_step, n_M=n_M)
 
-    p_M_L_samples = M_from_L(L, ref=ref, mc=mc, **kwargs)
+    p_M_L_samples = M_from_L(L, ref=ref, mc=mc)
 
     p_M_L_ = pdf_from_samples(p_M_L_samples, x_min=p_M.x.min(),
                               x_max=p_M.x.max())
@@ -518,15 +530,15 @@ def p_M_L(L, p_M=None, p_M_min=None, p_M_max=None, M_step=None, n_M=None,
 
 
 def p_M_DL(D, L, p_M=None, p_M_min=None, p_M_max=None, M_step=None, n_M=None,
-           p_M_type='uniform', ref='wc', L_mc=True, **kwargs):
+           p_M_type='uniform', ref='wc', L_mc=True):
     
     if p_M is None:
         p_M = make_p_M(p_M_type=p_M_type, p_M_min=p_M_min, p_M_max=p_M_max,
                        M_step=M_step, n_M=n_M)
 
-    p_M_D_ = p_M_D(D, p_M, ref=ref, **kwargs)
+    p_M_D_ = p_M_D(D, p_M, ref=ref)
 
-    p_M_L_samples = M_from_L(L, ref=ref, mc=L_mc, **kwargs)
+    p_M_L_samples = M_from_L(L, ref=ref, mc=L_mc)
 
     p_M_L_ = pdf_from_samples(p_M_L_samples, x_min=p_M.x.min(), 
                               x_max=p_M.x.max())
