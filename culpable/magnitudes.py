@@ -530,13 +530,13 @@ def p_M_L(L, p_M=None, p_M_min=None, p_M_max=None, M_step=None, n_M=None,
 
 
 def p_M_DL(D, L, p_M=None, p_M_min=None, p_M_max=None, M_step=None, n_M=None,
-           p_M_type='uniform', ref='wc', L_mc=True):
+           p_M_type='uniform', ref='wc', L_mc=True, sample_bias_corr=False):
     
     if p_M is None:
         p_M = make_p_M(p_M_type=p_M_type, p_M_min=p_M_min, p_M_max=p_M_max,
                        M_step=M_step, n_M=n_M)
 
-    p_M_D_ = p_M_D(D, p_M, ref=ref)
+    p_M_D_ = p_M_D(D, p_M, ref=ref, sample_bias_corr=sample_bias_corr)
 
     p_M_L_samples = M_from_L(L, ref=ref, mc=L_mc)
 
