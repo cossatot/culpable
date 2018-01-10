@@ -102,13 +102,16 @@ gr_pm_y = [0.000, 0.030, 0.050, 0.063, 0.081, 0.089, 0.089, 0.085, 0.079,
 Conversion functions
 """
 
+def _exp_10(x):
+    return 10**x
+
 
 log_fn = {'e': np.log,
           '10': np.log10}
           
 
-exp_fn{'e': np.exp,
-       '10': _exp_10}
+exp_fn = {'e': np.exp,
+          '10': _exp_10}
 
 
 M_from_D_coeffs = {'BW_2006': {'a': 6.94,
@@ -131,12 +134,35 @@ M_from_D_coeffs = {'BW_2006': {'a': 6.94,
                    'WC_1994_N':   {'a': 6.78,
                                    'b': 0.65,
                                    'log_base': '10'},
-
                    }
 
 
-def _exp_10(x):
-    return 10**x
+M_from_L_coeffs = {'Stirling_2002_instr': {'a': 5.45,
+                                           'b': 0.95,
+                                           'log_base': '10'},
+
+                   'Stirling_2002_pre_instr': {'a': 5.89,
+                                               'b': 0.79,
+                                               'log_base': '10'},
+
+                   'WC_1994_all': {'a': 5.08,
+                                   'b': 1.16,
+                                   'log_base': '10'},
+
+                   'WC_1994_SS':  {'a': 5.16,
+                                   'b': 1.12,
+                                   'log_base': '10'},
+
+                   'WC_1994_R':   {'a': 5.00,
+                                   'b': 1.22,
+                                   'log_base': '10'},
+
+                   'WC_1994_N':   {'a': 4.86,
+                                   'b': 1.32,
+                                   'log_base': '10'},
+                   }
+
+
 
 
 def M_from_D(D, ref='BW_2006', a=None, b=None, base='e'):
@@ -173,12 +199,12 @@ def M_from_D(D, ref='BW_2006', a=None, b=None, base='e'):
 
         a = M_from_D_coeffs[ref]['a']
         b = M_from_D_coeffs[ref]['b']
-        log_base = M_from_D_coeffs[ref]['log_base']
+        base = M_from_D_coeffs[ref]['log_base']
 
     else:
         pass
 
-    return a + b * log_fn[log_base](D)
+    return a + b * log_fn[base](D)
 
 
 def D_from_M(M, ref='BW_2006', a=None, b=None, base='e'):
@@ -224,25 +250,7 @@ def D_from_M(M, ref='BW_2006', a=None, b=None, base='e'):
     return exp_fn[base]((M - a) / b)
 
 
-def M_from_L_wc(L):
-    """
-    Magnitude from displacement using the scaling of Wells and Coppersmith '94.
-
-    Parameters
-    ----------
-    D : Scalar or vector values for displacement (in meters)
-
-
-    Returns
-    -------
-    M : Scalar or vector of calculated magnitude
-    """
-
-    return 5.0 + 1.22 * np.log10(L)
-
-
-def M_from_L(L, ref='wc', unit='km', a=None, a_err=None, b=None, b_err=None,
-             log='e', mc=False):
+def M_from_L(L, ref='Stirling_2002_instr', unit='km', a=None,b=None, base='e'):
     """
     Moment magnitude from length, using the specified scaling
     (keyword 'ref', or parameters 'a', 'b' and 'log'.
@@ -280,36 +288,16 @@ def M_from_L(L, ref='wc', unit='km', a=None, a_err=None, b=None, b_err=None,
     if unit == 'm':
         L = L * 1000.
 
-    # calcs
-    if ref == 'wc':
-        a = 5.08
-        a_err = 0.1
-        b = 1.16
-        b_err = 0.07
-        log = 10
+    if ref is not None:
+        a = M_from_L_coeffs[ref]['a']
+        b = M_from_L_coeffs[ref]['b']
+        base = M_from_L_coeffs[ref]['log_base']
 
-    elif ref == 'cus':
-        # some checks for parameters?
+    else:
         pass
 
-    else:
-        raise ValueError('{} is not a known reference'.format(ref))
+    return a + b * log_fn[base](L)
 
-    if mc == True:
-        A = a if a_err is None else np.random.normal(a, a_err, len(L))
-        B = b if b_err is None else np.random.normal(b, b_err, len(L))
-    else:
-        A = a
-        B = b
-
-    # do calcs
-    if log == 'e':
-        return A + B * np.log(L)
-    elif log in ('10', 10):
-        return A + B * np.log10(L)
-    
-    else:
-        raise NotImplementedError
 
 
 """
