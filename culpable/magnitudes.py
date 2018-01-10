@@ -102,73 +102,44 @@ gr_pm_y = [0.000, 0.030, 0.050, 0.063, 0.081, 0.089, 0.089, 0.085, 0.079,
 Conversion functions
 """
 
-def M_from_D_bw(D):
-    """
-    Magnitude from displacement using the scaling of Biasi and Weldon (2006).
 
-    Parameters
-    ----------
-    D : Scalar or vector values for displacement (in meters)
+log_fn = {'e': np.log,
+          '10': np.log10}
+          
 
-
-    Returns
-    -------
-    M : Scalar or vector of calculated magnitude
-    """
-
-    return 6.94 + 1.14 * np.log10(D)
+exp_fn{'e': np.exp,
+       '10': _exp_10}
 
 
-def M_from_D_wc(D):
-    """
-    Magnitude from displacement using the scaling of Wells and Coppersmith '94.
+M_from_D_coeffs = {'BW_2006': {'a': 6.94,
+                               'b': 1.14,
+                               'log_base': '10'},
 
-    Parameters
-    ----------
-    D : Scalar or vector values for displacement (in meters)
+                   # WC_1994 are for Average Displacement, not max.
+                   'WC_1994_all': {'a': 6.93,
+                                   'b': 0.82,
+                                   'log_base': '10'},
 
+                   'WC_1994_SS':  {'a': 7.04,
+                                   'b': 0.89,
+                                   'log_base': '10'},
 
-    Returns
-    -------
-    M : Scalar or vector of calculated magnitude
-    """
+                   'WC_1994_R':   {'a': 6.64,
+                                   'b': 0.13,
+                                   'log_base': '10'},
 
-    return 6.93 + 0.82 * np.log(D)
+                   'WC_1994_N':   {'a': 6.78,
+                                   'b': 0.65,
+                                   'log_base': '10'},
 
-
-def D_from_M_bw(M):
-    """
-    Displacement from magnitude using the scaling of Biasi and Weldon (2006).
-
-    Parameters
-    ----------
-    M : Scalar or vector values for moment magnitude
-
-    Returns
-    -------
-    D : Scalar or vector of calculated displacement (in meters)
-    """
-
-    return 10**((M - 6.94) / 1.14)
+                   }
 
 
-def D_from_M_wc(M):
-    """
-    Displacement from magnitude using the scaling of Wells and Coppersmith '94.
-
-    Parameters
-    ----------
-    M : Scalar or vector values for moment magnitude
-
-    Returns
-    -------
-    D : Scalar or vector of calculated displacement (in meters)
-    """
-
-    return np.exp((M - 6.93) / 0.82)
+def _exp_10(x):
+    return 10**x
 
 
-def M_from_D(D, ref='bw', a=None, b=None, log='e'):
+def M_from_D(D, ref='BW_2006', a=None, b=None, base='e'):
     """
     Moment magnitude from displacement, using the specified scaling
     (keyword 'ref', or parameters 'a', 'b' and 'log'.
@@ -180,17 +151,17 @@ def M_from_D(D, ref='bw', a=None, b=None, log='e'):
     D : Scalar or vector values for displacement (in meters)
 
     ref : string indicating scaling relationship, default 'bw'.
-        'bw' is Biasi and Weldon (2006).
-        'wc' is Wells and Coppersmith (1994).
-        'cus' is custom, using values of 'a', 'b' and 'log'.
+        'BW_2006' is Biasi and Weldon (2006).
+        'WC_1994' is Wells and Coppersmith (1994).
+        'cus' is custom, using values of 'a', 'b' and 'log' specified here.
 
     a : Scalar, or vector of same length as D.
 
     b : Scalar, or vector of same length as D.
 
-    log : String, base for logarithm, default 'e'.
-        'e' is natural log.
-        '10' is log10.
+    base : String, base for logarithm, default 'e'.
+           'e' is natural log.
+           '10' is log10.
 
 
     Returns
@@ -198,25 +169,19 @@ def M_from_D(D, ref='bw', a=None, b=None, log='e'):
     M : Scalar or vector of calculated magnitude, with shape of D.
     """
 
-    if ref == 'bw':
-        return M_from_D_bw(D)
+    if ref is not None:
 
-    elif ref == 'wc':
-        return M_from_D_wc(D)
-
-    elif ref == 'cus':
-
-        if log == 'e':
-            return a + b * np.log(D)
-
-        elif log in ('10', 10):
-            return a + b * np.log10(D)
+        a = M_from_D_coeffs[ref]['a']
+        b = M_from_D_coeffs[ref]['b']
+        log_base = M_from_D_coeffs[ref]['log_base']
 
     else:
-        raise NotImplementedError
+        pass
+
+    return a + b * log_fn[log_base](D)
 
 
-def D_from_M(M, ref='bw', a=None, b=None, base = 'e'):
+def D_from_M(M, ref='BW_2006', a=None, b=None, base='e'):
     """
     Moment magnitude from displacement, using the specified scaling
     (keyword 'ref', or parameters 'a', 'b' and 'base'.
@@ -247,22 +212,16 @@ def D_from_M(M, ref='bw', a=None, b=None, base = 'e'):
         with shape of M.
     """
 
-    if ref == 'bw':
-        return D_from_M_bw(M)
+    if ref is not None:
 
-    elif ref == 'wc':
-        return D_from_M_wc(M)
-
-    elif ref == 'cus':
-
-        if log == 'e':
-            return exp((M - a) / b)
-
-        elif log in ('10', 10):
-            return 10. ** ((M - a) / b)
+        a = M_from_D_coeffs[ref]['a']
+        b = M_from_D_coeffs[ref]['b']
+        base = M_from_D_coeffs[ref]['log_base']
 
     else:
-        raise NotImplementedError
+        pass
+
+    return exp_fn[base]((M - a) / b)
 
 
 def M_from_L_wc(L):
