@@ -473,7 +473,7 @@ def p_M_D(D, p_M=None, p_M_min=None, p_M_max=None, M_step=None, n_M=None,
 
 
 def p_M_L(L, p_M=None, p_M_min=None, p_M_max=None, M_step=None, n_M=None,
-          p_M_type='uniform', ref='WC_1994_ll', mc=True):
+          p_M_type='uniform', ref='WC_1994_all', mc=True):
 
     if p_M is None:
         p_M = make_p_M(p_M_type=p_M_type, p_M_min=p_M_min, p_M_max=p_M_max,
@@ -490,16 +490,18 @@ def p_M_L(L, p_M=None, p_M_min=None, p_M_max=None, M_step=None, n_M=None,
 
 
 def p_M_DL(D, L, p_M=None, p_M_min=None, p_M_max=None, M_step=None, n_M=None,
-           p_M_type='uniform', ref='WC_1994_all', L_mc=True, 
-           sample_bias_corr=False):
+           p_M_type='uniform', D_ref='BW_2006', L_ref='WC_1994_all',
+           L_mc=True, sample_bias_corr=False):
     
     if p_M is None:
         p_M = make_p_M(p_M_type=p_M_type, p_M_min=p_M_min, p_M_max=p_M_max,
                        M_step=M_step, n_M=n_M)
 
-    p_M_D_ = p_M_D(D, p_M, ref=ref, sample_bias_corr=sample_bias_corr)
+    p_M_D_ = p_M_D(D, p_M, ref=D_ref, sample_bias_corr=sample_bias_corr)
 
-    p_M_L_samples = M_from_L(L, ref=ref, mc=L_mc)
+    
+
+    p_M_L_samples = M_from_L(L, ref=L_ref, mc=L_mc)
 
     p_M_L_ = pdf_from_samples(p_M_L_samples, x_min=p_M.x.min(), 
                               x_max=p_M.x.max())
