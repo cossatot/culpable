@@ -41,7 +41,10 @@ class _Pdf(interp1d):
     def score_at_percentile(self, pctile):
         """pctile should be a decimal (between 0. and 1.)"""
 
-        return self.icdf(pctile)
+        if np.isscalar(pctile):
+            return float(self.icdf(pctile))
+        else:
+            return self.icdf(pctile)
 
     def median(self):
         return self.score_at_percentile(0.5)

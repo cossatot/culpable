@@ -34,43 +34,41 @@ Dn_x = np.array(
       3.65953639,  3.69805782,  3.73657926,  3.77510069,  3.81362213])
 
 Dn_y = np.array(
-    [ 3.56431234e-01,   4.07514412e-01,   4.49469325e-01,
-      4.80250978e-01,   4.99600050e-01,   5.08967345e-01,
-      5.11056831e-01,   5.09135209e-01,   5.06305810e-01,
-      5.04929021e-01,   5.06305202e-01,   5.10647854e-01,
-      5.17294850e-01,   5.25056042e-01,   5.32585263e-01,
-      5.38688051e-01,   5.42518154e-01,   5.43657945e-01,
-      5.42107125e-01,   5.38215229e-01,   5.32589131e-01,
-      5.25993774e-01,   5.19250549e-01,   5.13129949e-01,
-      5.08236899e-01,   5.04898081e-01,   5.03074847e-01,
-      5.02334004e-01,   5.01903866e-01,   5.00822254e-01,
-      4.98152675e-01,   4.93216557e-01,   4.85776256e-01,
-      4.76112653e-01,   4.64970884e-01,   4.53387277e-01,
-      4.42445033e-01,   4.33023117e-01,   4.25598012e-01,
-      4.20136711e-01,   4.16092401e-01,   4.12492219e-01,
-      4.08093894e-01,   4.01583982e-01,   3.91790171e-01,
-      3.77880214e-01,   3.59519131e-01,   3.36956396e-01,
-      3.11019404e-01,   2.83002312e-01,   2.54461304e-01,
-      2.26954105e-01,   2.01783046e-01,   1.79805426e-01,
-      1.61356306e-01,   1.46292387e-01,   1.34126853e-01,
-      1.24201482e-01,   1.15842979e-01,   1.08470898e-01,
-      1.01650879e-01,   9.51051805e-02,   8.86970782e-02,
-      8.24006991e-02,   7.62618151e-02,   7.03540397e-02,
-      6.47382510e-02,   5.94357659e-02,   5.44230300e-02,
-      4.96471997e-02,   4.50527124e-02,   4.06047119e-02,
-      3.62987575e-02,   3.21550847e-02,   2.82040784e-02,
-      2.44727150e-02,   2.09786579e-02,   1.77325398e-02,
-      1.47440829e-02,   1.20266593e-02,   9.59725861e-03,
-      7.47225770e-03,   5.66159378e-03,   4.16411755e-03,
-      2.96568107e-03,   2.04006393e-03,   1.35194170e-03,
-      8.60866657e-04,   5.25372416e-04,   3.06545806e-04,
-      1.70626053e-04,   9.04155999e-05,   4.55329491e-05,
-      2.17590136e-05,   9.85449333e-06,   4.22528115e-06,
-      1.71367970e-06,   6.56980895e-07,   2.37946616e-07,
-      8.13790788e-08])
+    [ 3.56431234e-01,   4.07514412e-01,   4.49469325e-01,   4.80250978e-01,
+      4.99600050e-01,   5.08967345e-01,   5.11056831e-01,   5.09135209e-01,
+      5.06305810e-01,   5.04929021e-01,   5.06305202e-01,   5.10647854e-01,
+      5.17294850e-01,   5.25056042e-01,   5.32585263e-01,   5.38688051e-01,
+      5.42518154e-01,   5.43657945e-01,   5.42107125e-01,   5.38215229e-01,
+      5.32589131e-01,   5.25993774e-01,   5.19250549e-01,   5.13129949e-01,
+      5.08236899e-01,   5.04898081e-01,   5.03074847e-01,   5.02334004e-01,
+      5.01903866e-01,   5.00822254e-01,   4.98152675e-01,   4.93216557e-01,
+      4.85776256e-01,   4.76112653e-01,   4.64970884e-01,   4.53387277e-01,
+      4.42445033e-01,   4.33023117e-01,   4.25598012e-01,   4.20136711e-01,
+      4.16092401e-01,   4.12492219e-01,   4.08093894e-01,   4.01583982e-01,
+      3.91790171e-01,   3.77880214e-01,   3.59519131e-01,   3.36956396e-01,
+      3.11019404e-01,   2.83002312e-01,   2.54461304e-01,   2.26954105e-01,
+      2.01783046e-01,   1.79805426e-01,   1.61356306e-01,   1.46292387e-01,
+      1.34126853e-01,   1.24201482e-01,   1.15842979e-01,   1.08470898e-01,
+      1.01650879e-01,   9.51051805e-02,   8.86970782e-02,   8.24006991e-02,
+      7.62618151e-02,   7.03540397e-02,   6.47382510e-02,   5.94357659e-02,
+      5.44230300e-02,   4.96471997e-02,   4.50527124e-02,   4.06047119e-02,
+      3.62987575e-02,   3.21550847e-02,   2.82040784e-02,   2.44727150e-02,
+      2.09786579e-02,   1.77325398e-02,   1.47440829e-02,   1.20266593e-02,
+      9.59725861e-03,   7.47225770e-03,   5.66159378e-03,   4.16411755e-03,
+      2.96568107e-03,   2.04006393e-03,   1.35194170e-03,   8.60866657e-04,
+      5.25372416e-04,   3.06545806e-04,   1.70626053e-04,   9.04155999e-05,
+      4.55329491e-05,   2.17590136e-05,   9.85449333e-06,   4.22528115e-06,
+      1.71367970e-06,   6.56980895e-07,   2.37946616e-07,   8.13790788e-08])
 
 
 Dn = Pdf(Dn_x, Dn_y)
+
+
+
+
+Dn_sb = multiply_pdfs(Dn, Pdf([Dn_x.min(), Dn_x.max()], 
+                              [Dn_x.min(), Dn_x.max()]))
+
 
 
 """
@@ -95,73 +93,82 @@ gr_pm_y = [0.000, 0.030, 0.050, 0.063, 0.081, 0.089, 0.089, 0.085, 0.079,
 Conversion functions
 """
 
-def M_from_D_bw(D):
-    """
-    Magnitude from displacement using the scaling of Biasi and Weldon (2006).
-
-    Parameters
-    ----------
-    D : Scalar or vector values for displacement (in meters)
+def _exp_10(x):
+    return 10**x
 
 
-    Returns
-    -------
-    M : Scalar or vector of calculated magnitude
-    """
+log_fn = {'e': np.log,
+          '10': np.log10}
+          
 
-    return 6.94 + 1.14 * np.log10(D)
-
-
-def M_from_D_wc(D):
-    """
-    Magnitude from displacement using the scaling of Wells and Coppersmith '94.
-
-    Parameters
-    ----------
-    D : Scalar or vector values for displacement (in meters)
+exp_fn = {'e': np.exp,
+          '10': _exp_10}
 
 
-    Returns
-    -------
-    M : Scalar or vector of calculated magnitude
-    """
+M_from_D_coeffs = {'BW_2006': {'a': 6.94,
+                               'b': 1.14,
+                               'log_base': '10'},
 
-    return 6.93 + 0.82 * np.log(D)
+                   # WC_1994 are for Average Displacement, not max.
+                   'WC_1994_all': {'a': 6.93,
+                                   'b': 0.82,
+                                   'log_base': '10'},
 
+                   'WC_1994_SS':  {'a': 7.04,
+                                   'b': 0.89,
+                                   'log_base': '10'},
 
-def D_from_M_bw(M):
-    """
-    Displacement from magnitude using the scaling of Biasi and Weldon (2006).
+                   'WC_1994_R':   {'a': 6.64,
+                                   'b': 0.13,
+                                   'log_base': '10'},
 
-    Parameters
-    ----------
-    M : Scalar or vector values for moment magnitude
-
-    Returns
-    -------
-    D : Scalar or vector of calculated displacement (in meters)
-    """
-
-    return 10**((M - 6.94) / 1.14)
-
-
-def D_from_M_wc(M):
-    """
-    Displacement from magnitude using the scaling of Wells and Coppersmith '94.
-
-    Parameters
-    ----------
-    M : Scalar or vector values for moment magnitude
-
-    Returns
-    -------
-    D : Scalar or vector of calculated displacement (in meters)
-    """
-
-    return np.exp((M - 6.93) / 0.82)
+                   'WC_1994_N':   {'a': 6.78,
+                                   'b': 0.65,
+                                   'log_base': '10'},
+                   }
 
 
-def M_from_D(D, ref='bw', a=None, b=None, log='e'):
+M_from_L_coeffs = {'Stirling_2002_instr': {'a': 5.45,
+                                           'a_err': 0.08,
+                                           'b': 0.95,
+                                           'b_err': 0.06,
+                                           'log_base': '10'},
+
+                   'Stirling_2002_pre_instr': {'a': 5.89,
+                                               'a_err': 0.11,
+                                               'b': 0.79,
+                                               'b_err': 0.06,
+                                               'log_base': '10'},
+
+                   'WC_1994_all': {'a': 5.08,
+                                   'a_err': 0.1,
+                                   'b': 1.16,
+                                   'b_err': 0.07,
+                                   'log_base': '10'},
+
+                   'WC_1994_SS':  {'a': 5.16,
+                                   'a_err': 0.13,
+                                   'b': 1.12,
+                                   'b_err': 0.08,
+                                   'log_base': '10'},
+
+                   'WC_1994_R':   {'a': 5.00,
+                                   'a_err': 0.22,
+                                   'b': 1.22,
+                                   'b_err': 0.16,
+                                   'log_base': '10'},
+
+                   'WC_1994_N':   {'a': 4.86,
+                                   'a_err': 0.34,
+                                   'b': 1.32,
+                                   'b_err': 0.26,
+                                   'log_base': '10'},
+                   }
+
+
+
+
+def M_from_D(D, ref='BW_2006', a=None, b=None, base='e'):
     """
     Moment magnitude from displacement, using the specified scaling
     (keyword 'ref', or parameters 'a', 'b' and 'log'.
@@ -172,18 +179,21 @@ def M_from_D(D, ref='bw', a=None, b=None, log='e'):
     ----------
     D : Scalar or vector values for displacement (in meters)
 
-    ref : string indicating scaling relationship, default 'bw'.
-        'bw' is Biasi and Weldon (2006).
-        'wc' is Wells and Coppersmith (1994).
-        'cus' is custom, using values of 'a', 'b' and 'log'.
+    ref : string indicating scaling relationship.
+        'BW_2006' is Biasi and Weldon (2006) (default).
+        'WC_1994_all' is Wells and Coppersmith (1994) for all events.
+        'WC_1994_SS' is Wells and Coppersmith (1994) for strike-slip events.
+        'WC_1994_R' is Wells and Coppersmith (1994) for reverse events.
+        'WC_1994_N' is Wells and Coppersmith (1994) for normal events.
+        `ref=None` will allow you to enter your own coefficients and base.
 
     a : Scalar, or vector of same length as D.
 
     b : Scalar, or vector of same length as D.
 
-    log : String, base for logarithm, default 'e'.
-        'e' is natural log.
-        '10' is log10.
+    base : String, base for logarithm, default 'e'.
+           'e' is natural log.
+           '10' is log10.
 
 
     Returns
@@ -191,25 +201,19 @@ def M_from_D(D, ref='bw', a=None, b=None, log='e'):
     M : Scalar or vector of calculated magnitude, with shape of D.
     """
 
-    if ref == 'bw':
-        return M_from_D_bw(D)
+    if ref is not None:
 
-    elif ref == 'wc':
-        return M_from_D_wc(D)
-
-    elif ref == 'cus':
-
-        if log == 'e':
-            return a + b * np.log(D)
-
-        elif log in ('10', 10):
-            return a + b * np.log10(D)
+        a = M_from_D_coeffs[ref]['a']
+        b = M_from_D_coeffs[ref]['b']
+        base = M_from_D_coeffs[ref]['log_base']
 
     else:
-        raise NotImplementedError
+        pass
+
+    return a + b * log_fn[base](D)
 
 
-def D_from_M(M, ref='bw', a=None, b=None, base = 'e'):
+def D_from_M(M, ref='BW_2006', a=None, b=None, base='e'):
     """
     Moment magnitude from displacement, using the specified scaling
     (keyword 'ref', or parameters 'a', 'b' and 'base'.
@@ -220,18 +224,21 @@ def D_from_M(M, ref='bw', a=None, b=None, base = 'e'):
     ----------
     M : Scalar or vector values for moment magnitude
 
-    ref : string indicating scaling relationship, default 'bw'.
-        'bw' is Biasi and Weldon (2006).
-        'wc' is Wells and Coppersmith (1994).
-        'cus' is custom, using values of 'a', 'b' and 'base'.
+    ref : string indicating scaling relationship.
+        'BW_2006' is Biasi and Weldon (2006) (default).
+        'WC_1994_all' is Wells and Coppersmith (1994) for all events.
+        'WC_1994_SS' is Wells and Coppersmith (1994) for strike-slip events.
+        'WC_1994_R' is Wells and Coppersmith (1994) for reverse events.
+        'WC_1994_N' is Wells and Coppersmith (1994) for normal events.
+        `ref=None` will allow you to enter your own coefficients and base.
 
     a : Scalar, or vector of same length as M.
 
     b : Scalar, or vector of same length as M.
 
     base : String, base for exponent, default 'e'.
-        'e' is e.
-        '10' is 10.
+           'e' is e.
+           '10' is 10.
 
 
     Returns
@@ -240,43 +247,17 @@ def D_from_M(M, ref='bw', a=None, b=None, base = 'e'):
         with shape of M.
     """
 
-    if ref == 'bw':
-        return D_from_M_bw(M)
+    if ref is not None:
 
-    elif ref == 'wc':
-        return D_from_M_wc(M)
+        a = M_from_D_coeffs[ref]['a']
+        b = M_from_D_coeffs[ref]['b']
+        base = M_from_D_coeffs[ref]['log_base']
 
-    elif ref == 'cus':
-
-        if log == 'e':
-            return exp((M - a) / b)
-
-        elif log in ('10', 10):
-            return 10. ** ((M - a) / b)
-
-    else:
-        raise NotImplementedError
+    return exp_fn[base]((M - a) / b)
 
 
-def M_from_L_wc(L):
-    """
-    Magnitude from displacement using the scaling of Wells and Coppersmith '94.
-
-    Parameters
-    ----------
-    D : Scalar or vector values for displacement (in meters)
-
-
-    Returns
-    -------
-    M : Scalar or vector of calculated magnitude
-    """
-
-    return 5.0 + 1.22 * np.log10(L)
-
-
-def M_from_L(L, ref='wc', unit='km', a=None, a_err=None, b=None, b_err=None,
-             log='e', mc=False):
+def M_from_L(L, ref='Stirling_2002_instr', unit='km', a=None, b=None, base='e',
+             a_err=None, b_err=None, mc=False):
     """
     Moment magnitude from length, using the specified scaling
     (keyword 'ref', or parameters 'a', 'b' and 'log'.
@@ -287,10 +268,13 @@ def M_from_L(L, ref='wc', unit='km', a=None, a_err=None, b=None, b_err=None,
     ----------
     D : Scalar or vector values for displacement (in meters)
 
-    ref : string indicating scaling relationship, default 'bw'.
-        'bw' is Biasi and Weldon (2006).
-        'wc' is Wells and Coppersmith (1994).
-        'cus' is custom, using values of 'a', 'b' and 'log'.
+    ref : string indicating scaling relationship.
+        'Stirling_2002_instr' is from Stirling et al. 2002, instrumental data.
+        'WC_1994_all' is Wells and Coppersmith (1994) for all events.
+        'WC_1994_SS' is Wells and Coppersmith (1994) for strike-slip events.
+        'WC_1994_R' is Wells and Coppersmith (1994) for reverse events.
+        'WC_1994_N' is Wells and Coppersmith (1994) for normal events.
+        `ref=None` will allow you to enter your own coefficients and base.
 
     unit : Unit of length measure. Default is 'km'.  'm' also works.
 
@@ -304,6 +288,10 @@ def M_from_L(L, ref='wc', unit='km', a=None, a_err=None, b=None, b_err=None,
         'e' is natural log.
         '10' is log10.
 
+    mc : Boolean that indicates whether to sample the coefficents a and b
+         including uncertainties a_err and b_err through Monte Carlo
+         techniques.
+
 
     Returns
     -------
@@ -314,43 +302,35 @@ def M_from_L(L, ref='wc', unit='km', a=None, a_err=None, b=None, b_err=None,
     if unit == 'm':
         L = L * 1000.
 
-    # calcs
-    if ref == 'wc':
-        a = 5.08
-        a_err = 0.1
-        b = 1.16
-        b_err = 0.07
-        log = 10
+    if ref is not None:
+        a = M_from_L_coeffs[ref]['a']
+        b = M_from_L_coeffs[ref]['b']
+        base = M_from_L_coeffs[ref]['log_base']
 
-    elif ref == 'cus':
-        # some checks for parameters?
-        pass
+        try:
+            a_err = M_from_L_coeffs[ref]['a_err']
+            b_err = M_from_L_coeffs[ref]['b_err']
+        except KeyError:
+            pass
 
-    else:
-        raise ValueError('{} is not a known reference'.format(ref))
 
     if mc == True:
         A = a if a_err is None else np.random.normal(a, a_err, len(L))
         B = b if b_err is None else np.random.normal(b, b_err, len(L))
+
     else:
         A = a
         B = b
 
-    # do calcs
-    if log == 'e':
-        return A + B * np.log(L)
-    elif log in ('10', 10):
-        return A + B * np.log10(L)
-    
-    else:
-        raise NotImplementedError
+    return A + B * log_fn[base](L)
+
 
 
 """
 Estimation functions
 """
 
-def p_D_M(D, M, ref='bw', **kwargs):
+def p_D_M(D, M, ref='BW_2006', sample_bias_corr=False):
     """
     Likelihood of predicted D given M, as defined by Biasi and Weldon (2006).
 
@@ -361,8 +341,8 @@ def p_D_M(D, M, ref='bw', **kwargs):
     M : Scalar or array of magnitudes.
 
     ref: Displacement-magnitude scaling reference (string).
-        'bw' is Biasi and Weldon (2006).
-        'wc' is Wells and Coppersmith (1994).
+        'BW_2006' is Biasi and Weldon (2006).
+        'WC_1994_all' is Wells and Coppersmith (1994).
 
     Returns
     -------
@@ -374,18 +354,23 @@ def p_D_M(D, M, ref='bw', **kwargs):
 
     """
 
-    D_ave = D_from_M(M, ref=ref, **kwargs)
+    D_ave = D_from_M(M, ref=ref)
 
     D = np.abs(D)
 
+    if sample_bias_corr == True:
+        Dn_ = Dn_sb
+    else:
+        Dn_ = Dn
+
     if np.isscalar(D):
         D_score = D / D_ave 
-        p_D_M =  Dn(D_score)
+        p_D_M = Dn_(D_score)
         
     else:
         D_score = np.array([d / D_ave for d in D])
 
-        p_D_M = Dn(D_score)
+        p_D_M = Dn_(D_score)
         p_D_M = np.mean(p_D_M, axis=0)
 
     if np.isscalar(p_D_M):
@@ -461,7 +446,26 @@ def make_p_M_gr_surface_break(p_M_min=5., p_M_max=8.5, M_step=0.1, n_M=None):
 
 def make_p_M(p_M_type='uniform', p_M_min=None, p_M_max=None, M_step=None, 
              n_M=None):
-    """Docstring"""
+    """
+    Creates the a PDF of magnitudes to use as the prior p(M).
+
+    Parameters
+    ----------
+    p_M_type : Type of prior. Current values are 'uniform' and 
+               'GR_surface_break' (i.e., a Gutenberg-Richter with WC 1994's
+               correction for the likelihood of events of different sizes
+               breaking the surface, as reported in BW 2006).
+
+    p_M_min : Minimum magnitude.
+    p_M_max : Maximum magnitude.
+    M_step : Width of steps in interpolation (no effect on final results).
+    n_M : number of points in interpolation (no effect on final results).
+
+    Returns
+    -------
+    p_M : Pdf function with a uniform distribution between p_M_min and p_M_max
+    
+    """
 
     if p_M_type == 'uniform':
         p_M = make_p_M_uniform(p_M_min=p_M_min, p_M_max=p_M_max,
@@ -475,10 +479,46 @@ def make_p_M(p_M_type='uniform', p_M_min=None, p_M_max=None, M_step=None,
 
 
 def p_M_D(D, p_M=None, p_M_min=None, p_M_max=None, M_step=None, n_M=None,
-          ref='bw', p_M_type='uniform', **kwargs):
+          ref='BW_2006', p_M_type='uniform', sample_bias_corr=False):
 
     """
-    Calculates earthquake magnitude given displacement.
+    Calculates p(M|D), the posterior probability of an earthquake having a
+    magnitude of M given observed displacement D, based on Biasi and Weldon
+    2006 (but with optional sample bias correction).
+
+    Either a `p_M` Pdf object should be passed, or the additional parameters
+    necessary to construct one; see `make_p_M`.
+
+    Parameters
+    ----------
+
+    D : Scalar or vector of displacements in meters (floats).
+
+    p_M : Prior magnitude distribution p(M), in the Pdf class from
+          culpable.stats.
+    
+    p_M_type : Type of prior. Current values are 'uniform' and 
+               'GR_surface_break' (i.e., a Gutenberg-Richter with WC 1994's
+               correction for the likelihood of events of different sizes
+               breaking the surface, as reported in BW 2006).
+
+    p_M_min : Minimum prior magnitude; only needed if `p_M` is not given.
+    p_M_min : Minimum prior magnitude; only needed if `p_M` is not given.
+    M_step : Spacing for `p_M`; only needed if `p_M` is not given.
+    n_M :  number of points for `p_M`; only needed if `p_M` is not given.
+
+    ref : Reference for magnitude-displacement scaling relationships. See
+          `M_from_D` for a list of implemented relationships.
+
+    sample_bias_coorection: Boolean indicating whether to correct for
+                            preferential sampling of scarps proportionally
+                            to the offset at a point relative to the min
+                            and max offsets.
+
+    Returns
+    ------
+    
+    p_M_D : Pdf function of the posterior magnitude estimation p(M|D).
     """
 
     if p_M is None:
@@ -488,10 +528,10 @@ def p_M_D(D, p_M=None, p_M_min=None, p_M_max=None, M_step=None, n_M=None,
         #TODO: maybe add some logic for dealing with non `Pdf` priors
         pass
 
-    p_D = np.array([np.trapz(Dn_y, Dn_x * D_from_M(M, ref=ref, **kwargs))
+    p_D = np.array([np.trapz(Dn_y, Dn_x * D_from_M(M, ref=ref))
                     for M in p_M.x])
 
-    p_D_M_ = p_D_M(D, p_M.x, ref=ref, **kwargs)
+    p_D_M_ = p_D_M(D, p_M.x, ref=ref, sample_bias_corr=sample_bias_corr)
 
     p_M_D_ = p_M.y * p_D_M_.y / p_D
 
@@ -501,13 +541,51 @@ def p_M_D(D, p_M=None, p_M_min=None, p_M_max=None, M_step=None, n_M=None,
 
 
 def p_M_L(L, p_M=None, p_M_min=None, p_M_max=None, M_step=None, n_M=None,
-          p_M_type='uniform', ref='wc', mc=True, **kwargs):
+          p_M_type='uniform', ref='WC_1994_all', mc=True):
+    """
+    Calculates p(M|L), the posterior probability of an earthquake having a
+    magnitude of M given observed length L.
+
+    Either a `p_M` Pdf object should be passed, or the additional parameters
+    necessary to construct one; see `make_p_M`.
+
+    Parameters
+    ----------
+
+    L : Scalar or vector of lengths in kilometers (floats).
+
+    p_M : Prior magnitude distribution p(M), in the Pdf class from
+          culpable.stats.
+
+    p_M_type : Type of prior. Current values are 'uniform' and 
+               'GR_surface_break' (i.e., a Gutenberg-Richter with WC 1994's
+               correction for the likelihood of events of different sizes
+               breaking the surface, as reported in BW 2006).
+
+    p_M_min : Minimum prior magnitude; only needed if `p_M` is not given.
+    p_M_min : Minimum prior magnitude; only needed if `p_M` is not given.
+    M_step : Spacing for `p_M`; only needed if `p_M` is not given.
+    n_M :  number of points for `p_M`; only needed if `p_M` is not given.
+
+    ref : Reference for magnitude-length scaling relationships. See `M_from_L`
+          for a list of implemented relationships.
+
+    mc : Boolean that describes whether to propagate the uncertainty (standard
+         errors) in the scaling relationship to the posterior using a Monte
+         Carlo simulation.
+
+    Returns
+    ------
+    
+    p_M_D : Pdf function of the posterior magnitude estimation p(M|D).
+    """
 
     if p_M is None:
+
         p_M = make_p_M(p_M_type=p_M_type, p_M_min=p_M_min, p_M_max=p_M_max,
                        M_step=M_step, n_M=n_M)
 
-    p_M_L_samples = M_from_L(L, ref=ref, mc=mc, **kwargs)
+    p_M_L_samples = M_from_L(L, ref=ref, mc=mc)
 
     p_M_L_ = pdf_from_samples(p_M_L_samples, x_min=p_M.x.min(),
                               x_max=p_M.x.max())
@@ -518,15 +596,64 @@ def p_M_L(L, p_M=None, p_M_min=None, p_M_max=None, M_step=None, n_M=None,
 
 
 def p_M_DL(D, L, p_M=None, p_M_min=None, p_M_max=None, M_step=None, n_M=None,
-           p_M_type='uniform', ref='wc', L_mc=True, **kwargs):
+           p_M_type='uniform', D_ref='BW_2006', L_ref='WC_1994_all',
+           L_mc=True, sample_bias_corr=False):
+    """
+    Calculates p(M|D,L), the posterior probability of an earthquake having a
+    magnitude of M given observed offset/displacement D and rupture length L.
+
+    Either a `p_M` Pdf object should be passed, or the additional parameters
+    necessary to construct one; see `make_p_M`.
+
+    Parameters
+    ----------
+
+    D : Scalar or vector of displacement in meters (floats).
+    L : Scalar or vector of lengths in kilometers (floats).
+
+    p_M : Prior magnitude distribution p(M), in the Pdf class from
+          culpable.stats.
+
+    p_M_type : Type of prior. Current values are 'uniform' and 
+               'GR_surface_break' (i.e., a Gutenberg-Richter with WC 1994's
+               correction for the likelihood of events of different sizes
+               breaking the surface, as reported in BW 2006).
+
+    p_M_min : Minimum prior magnitude; only needed if `p_M` is not given.
+    p_M_min : Minimum prior magnitude; only needed if `p_M` is not given.
+    M_step : Spacing for `p_M`; only needed if `p_M` is not given.
+    n_M :  number of points for `p_M`; only needed if `p_M` is not given.
+    
+    D_ref : Reference for magnitude-displacement scaling relationships. See
+            `M_from_D` for a list of implemented relationships.
+
+    L_ref : Reference for magnitude-length scaling relationships. See
+           `M_from_L` for a list of implemented relationships.
+
+    mc : Boolean that describes whether to propagate the uncertainty (standard
+         errors) in the scaling relationship to the posterior using a Monte
+         Carlo simulation.
+
+    sample_bias_coorection: Boolean indicating whether to correct for
+                            preferential sampling of scarps proportionally
+                            to the offset at a point relative to the min
+                            and max offsets.
+
+    Returns
+    ------
+    
+    p_M_D : Pdf function of the posterior magnitude estimation p(M|D).
+    """
     
     if p_M is None:
         p_M = make_p_M(p_M_type=p_M_type, p_M_min=p_M_min, p_M_max=p_M_max,
                        M_step=M_step, n_M=n_M)
 
-    p_M_D_ = p_M_D(D, p_M, ref=ref, **kwargs)
+    p_M_D_ = p_M_D(D, p_M, ref=D_ref, sample_bias_corr=sample_bias_corr)
 
-    p_M_L_samples = M_from_L(L, ref=ref, mc=L_mc, **kwargs)
+    
+
+    p_M_L_samples = M_from_L(L, ref=L_ref, mc=L_mc)
 
     p_M_L_ = pdf_from_samples(p_M_L_samples, x_min=p_M.x.min(), 
                               x_max=p_M.x.max())
