@@ -179,10 +179,13 @@ def M_from_D(D, ref='BW_2006', a=None, b=None, base='e'):
     ----------
     D : Scalar or vector values for displacement (in meters)
 
-    ref : string indicating scaling relationship, default 'bw'.
-        'BW_2006' is Biasi and Weldon (2006).
-        'WC_1994' is Wells and Coppersmith (1994).
-        'cus' is custom, using values of 'a', 'b' and 'log' specified here.
+    ref : string indicating scaling relationship.
+        'BW_2006' is Biasi and Weldon (2006) (default).
+        'WC_1994_all' is Wells and Coppersmith (1994) for all events.
+        'WC_1994_SS' is Wells and Coppersmith (1994) for strike-slip events.
+        'WC_1994_R' is Wells and Coppersmith (1994) for reverse events.
+        'WC_1994_N' is Wells and Coppersmith (1994) for normal events.
+        `ref=None` will allow you to enter your own coefficients and base.
 
     a : Scalar, or vector of same length as D.
 
@@ -221,18 +224,21 @@ def D_from_M(M, ref='BW_2006', a=None, b=None, base='e'):
     ----------
     M : Scalar or vector values for moment magnitude
 
-    ref : string indicating scaling relationship, default 'bw'.
-        'bw' is Biasi and Weldon (2006).
-        'wc' is Wells and Coppersmith (1994).
-        'cus' is custom, using values of 'a', 'b' and 'base'.
+    ref : string indicating scaling relationship.
+        'BW_2006' is Biasi and Weldon (2006) (default).
+        'WC_1994_all' is Wells and Coppersmith (1994) for all events.
+        'WC_1994_SS' is Wells and Coppersmith (1994) for strike-slip events.
+        'WC_1994_R' is Wells and Coppersmith (1994) for reverse events.
+        'WC_1994_N' is Wells and Coppersmith (1994) for normal events.
+        `ref=None` will allow you to enter your own coefficients and base.
 
     a : Scalar, or vector of same length as M.
 
     b : Scalar, or vector of same length as M.
 
     base : String, base for exponent, default 'e'.
-        'e' is e.
-        '10' is 10.
+           'e' is e.
+           '10' is 10.
 
 
     Returns
@@ -262,10 +268,13 @@ def M_from_L(L, ref='Stirling_2002_instr', unit='km', a=None, b=None, base='e',
     ----------
     D : Scalar or vector values for displacement (in meters)
 
-    ref : string indicating scaling relationship, default 'bw'.
-        'bw' is Biasi and Weldon (2006).
-        'wc' is Wells and Coppersmith (1994).
-        'cus' is custom, using values of 'a', 'b' and 'log'.
+    ref : string indicating scaling relationship.
+        'Stirling_2002_instr' is from Stirling et al. 2002, instrumental data.
+        'WC_1994_all' is Wells and Coppersmith (1994) for all events.
+        'WC_1994_SS' is Wells and Coppersmith (1994) for strike-slip events.
+        'WC_1994_R' is Wells and Coppersmith (1994) for reverse events.
+        'WC_1994_N' is Wells and Coppersmith (1994) for normal events.
+        `ref=None` will allow you to enter your own coefficients and base.
 
     unit : Unit of length measure. Default is 'km'.  'm' also works.
 
@@ -278,6 +287,10 @@ def M_from_L(L, ref='Stirling_2002_instr', unit='km', a=None, b=None, base='e',
     log : String, base for logarithm, default 'e'.
         'e' is natural log.
         '10' is log10.
+
+    mc : Boolean that indicates whether to sample the coefficents a and b
+         including uncertainties a_err and b_err through Monte Carlo
+         techniques.
 
 
     Returns
@@ -433,7 +446,26 @@ def make_p_M_gr_surface_break(p_M_min=5., p_M_max=8.5, M_step=0.1, n_M=None):
 
 def make_p_M(p_M_type='uniform', p_M_min=None, p_M_max=None, M_step=None, 
              n_M=None):
-    """Docstring"""
+    """
+    Creates the a PDF of magnitudes to use as the prior p(M).
+
+    Parameters
+    ----------
+    p_M_type : Type of prior. Current values are 'uniform' and 
+               'GR_surface_break' (i.e., a Gutenberg-Richter with WC 1994's
+               correction for the likelihood of events of different sizes
+               breaking the surface, as reported in BW 2006).
+
+    p_M_min : Minimum magnitude.
+    p_M_max : Maximum magnitude.
+    M_step : Width of steps in interpolation (no effect on final results).
+    n_M : number of points in interpolation (no effect on final results).
+
+    Returns
+    -------
+    p_M : Pdf function with a uniform distribution between p_M_min and p_M_max
+    
+    """
 
     if p_M_type == 'uniform':
         p_M = make_p_M_uniform(p_M_min=p_M_min, p_M_max=p_M_max,
@@ -450,7 +482,43 @@ def p_M_D(D, p_M=None, p_M_min=None, p_M_max=None, M_step=None, n_M=None,
           ref='BW_2006', p_M_type='uniform', sample_bias_corr=False):
 
     """
-    Calculates earthquake magnitude given displacement.
+    Calculates p(M|D), the posterior probability of an earthquake having a
+    magnitude of M given observed displacement D, based on Biasi and Weldon
+    2006 (but with optional sample bias correction).
+
+    Either a `p_M` Pdf object should be passed, or the additional parameters
+    necessary to construct one; see `make_p_M`.
+
+    Parameters
+    ----------
+
+    D : Scalar or vector of displacements in meters (floats).
+
+    p_M : Prior magnitude distribution p(M), in the Pdf class from
+          culpable.stats.
+    
+    p_M_type : Type of prior. Current values are 'uniform' and 
+               'GR_surface_break' (i.e., a Gutenberg-Richter with WC 1994's
+               correction for the likelihood of events of different sizes
+               breaking the surface, as reported in BW 2006).
+
+    p_M_min : Minimum prior magnitude; only needed if `p_M` is not given.
+    p_M_min : Minimum prior magnitude; only needed if `p_M` is not given.
+    M_step : Spacing for `p_M`; only needed if `p_M` is not given.
+    n_M :  number of points for `p_M`; only needed if `p_M` is not given.
+
+    ref : Reference for magnitude-displacement scaling relationships. See
+          `M_from_D` for a list of implemented relationships.
+
+    sample_bias_coorection: Boolean indicating whether to correct for
+                            preferential sampling of scarps proportionally
+                            to the offset at a point relative to the min
+                            and max offsets.
+
+    Returns
+    ------
+    
+    p_M_D : Pdf function of the posterior magnitude estimation p(M|D).
     """
 
     if p_M is None:
@@ -474,8 +542,46 @@ def p_M_D(D, p_M=None, p_M_min=None, p_M_max=None, M_step=None, n_M=None,
 
 def p_M_L(L, p_M=None, p_M_min=None, p_M_max=None, M_step=None, n_M=None,
           p_M_type='uniform', ref='WC_1994_all', mc=True):
+    """
+    Calculates p(M|L), the posterior probability of an earthquake having a
+    magnitude of M given observed length L.
+
+    Either a `p_M` Pdf object should be passed, or the additional parameters
+    necessary to construct one; see `make_p_M`.
+
+    Parameters
+    ----------
+
+    L : Scalar or vector of lengths in kilometers (floats).
+
+    p_M : Prior magnitude distribution p(M), in the Pdf class from
+          culpable.stats.
+
+    p_M_type : Type of prior. Current values are 'uniform' and 
+               'GR_surface_break' (i.e., a Gutenberg-Richter with WC 1994's
+               correction for the likelihood of events of different sizes
+               breaking the surface, as reported in BW 2006).
+
+    p_M_min : Minimum prior magnitude; only needed if `p_M` is not given.
+    p_M_min : Minimum prior magnitude; only needed if `p_M` is not given.
+    M_step : Spacing for `p_M`; only needed if `p_M` is not given.
+    n_M :  number of points for `p_M`; only needed if `p_M` is not given.
+
+    ref : Reference for magnitude-length scaling relationships. See `M_from_L`
+          for a list of implemented relationships.
+
+    mc : Boolean that describes whether to propagate the uncertainty (standard
+         errors) in the scaling relationship to the posterior using a Monte
+         Carlo simulation.
+
+    Returns
+    ------
+    
+    p_M_D : Pdf function of the posterior magnitude estimation p(M|D).
+    """
 
     if p_M is None:
+
         p_M = make_p_M(p_M_type=p_M_type, p_M_min=p_M_min, p_M_max=p_M_max,
                        M_step=M_step, n_M=n_M)
 
@@ -492,6 +598,52 @@ def p_M_L(L, p_M=None, p_M_min=None, p_M_max=None, M_step=None, n_M=None,
 def p_M_DL(D, L, p_M=None, p_M_min=None, p_M_max=None, M_step=None, n_M=None,
            p_M_type='uniform', D_ref='BW_2006', L_ref='WC_1994_all',
            L_mc=True, sample_bias_corr=False):
+    """
+    Calculates p(M|D,L), the posterior probability of an earthquake having a
+    magnitude of M given observed offset/displacement D and rupture length L.
+
+    Either a `p_M` Pdf object should be passed, or the additional parameters
+    necessary to construct one; see `make_p_M`.
+
+    Parameters
+    ----------
+
+    D : Scalar or vector of displacement in meters (floats).
+    L : Scalar or vector of lengths in kilometers (floats).
+
+    p_M : Prior magnitude distribution p(M), in the Pdf class from
+          culpable.stats.
+
+    p_M_type : Type of prior. Current values are 'uniform' and 
+               'GR_surface_break' (i.e., a Gutenberg-Richter with WC 1994's
+               correction for the likelihood of events of different sizes
+               breaking the surface, as reported in BW 2006).
+
+    p_M_min : Minimum prior magnitude; only needed if `p_M` is not given.
+    p_M_min : Minimum prior magnitude; only needed if `p_M` is not given.
+    M_step : Spacing for `p_M`; only needed if `p_M` is not given.
+    n_M :  number of points for `p_M`; only needed if `p_M` is not given.
+    
+    D_ref : Reference for magnitude-displacement scaling relationships. See
+            `M_from_D` for a list of implemented relationships.
+
+    L_ref : Reference for magnitude-length scaling relationships. See
+           `M_from_L` for a list of implemented relationships.
+
+    mc : Boolean that describes whether to propagate the uncertainty (standard
+         errors) in the scaling relationship to the posterior using a Monte
+         Carlo simulation.
+
+    sample_bias_coorection: Boolean indicating whether to correct for
+                            preferential sampling of scarps proportionally
+                            to the offset at a point relative to the min
+                            and max offsets.
+
+    Returns
+    ------
+    
+    p_M_D : Pdf function of the posterior magnitude estimation p(M|D).
+    """
     
     if p_M is None:
         p_M = make_p_M(p_M_type=p_M_type, p_M_min=p_M_min, p_M_max=p_M_max,
