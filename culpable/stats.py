@@ -47,6 +47,19 @@ class _Pdf(interp1d):
         return self.score_at_percentile(0.5)
 
 
+class DeltaPdf(object):
+    def __init__(self, x):
+        self.x = x
+
+    def __call__(val):
+        if val == self.x:
+           return 1.
+        else:
+           return 0.
+
+    def mean(self):
+        return self.x
+
 
 def Pdf(x, px, normalize=True):
     """docstring"""
@@ -57,14 +70,6 @@ def Pdf(x, px, normalize=True):
         _pdf = _Pdf(x, px, bounds_error=False, fill_value=0.)
 
     else:
-        class DeltaPdf(object):
-            def __init__(self, x):
-                 self.x = x
-            def __call__(val):
-                 if val == self.x:
-                    return 1.
-                 else:
-                    return 0.
         _pdf = DeltaPdf(x)
 
     return _pdf
