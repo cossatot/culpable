@@ -26,6 +26,7 @@ class _Pdf(interp1d):
                                    fill_value=fill_value)
         self.cdf = Cdf(x, px)
         self.icdf = Icdf(x, px)
+        self.px = self.y
 
     def mode(self):
         y_max = np.max(self.y)
@@ -118,26 +119,33 @@ def trim_pdf(x, px, min=None, max=None):
 def pdf_from_samples(samples, n=1000, x_min=None, x_max=None, cut=None, 
                      bw=None, return_arrays=False, close=True):
 
-    _kde = gaussian_kde(samples, bw_method=bw)
+    if np.isscalar(samples):
+        pdf = Pdf(samples, 1)
 
-    if cut == None:
-        bw = _kde.factor
-        cut = 3 * bw
-    
-    if x_min == None:
-        x_min = np.min(samples) - cut
+    elif np.all(samples == samples[0]):
+        pdf = Pdf(samples[0], 1)
 
-    if x_max == None:
-        x_max = np.max(samples) + cut
+    else:
+        _kde = gaussian_kde(samples, bw_method=bw)
 
-    x = np.linspace(x_min, x_max, n)
-    px = _kde.evaluate(x)
+        if cut == None:
+            bw = _kde.factor
+            cut = 3 * bw
+        
+        if x_min == None:
+            x_min = np.min(samples) - cut
 
-    if close == True:
-        px[0] = 0.
-        px[-1] = 0.
+        if x_max == None:
+            x_max = np.max(samples) + cut
 
-    pdf = Pdf(x, px)
+        x = np.linspace(x_min, x_max, n)
+        px = _kde.evaluate(x)
+
+        if close == True:
+            px[0] = 0.
+            px[-1] = 0.
+
+        pdf = Pdf(x, px)
 
     if return_arrays == True:
         return pdf.x, pdf.y
