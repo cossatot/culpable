@@ -24,8 +24,10 @@ class _Pdf(interp1d):
     def __init__(self, x, px, bounds_error=False, fill_value=0):
         super(_Pdf, self).__init__(x, px, bounds_error=bounds_error,
                                    fill_value=fill_value)
+
         self.cdf = Cdf(x, px, normalize=False)
         self.icdf = Icdf(x, px, normalize=False)
+        self.px = self.y
 
     def mode(self):
         y_max = np.max(self.y)
@@ -50,20 +52,35 @@ class _Pdf(interp1d):
         return self.score_at_percentile(0.5)
 
 
+class DeltaPdf(object):
+    def __init__(self, x):
+        self.x = x
+
+    def __call__(val):
+        if val == self.x:
+           return 1.
+        else:
+           return 0.
+
+    def mean(self):
+        return self.x
+
 
 def Pdf(x, px, normalize=True):
     """docstring"""
     if not np.isscalar(x):
         if normalize == True:
             x, px = normalize_pmf(x, px)
+        _pdf = _Pdf(x, px, bounds_error=False, fill_value=0.)
     
+#    else:
+#        eps = 1e-15 # real eps doesn't work for out purposes
+#
+#        x = [x-eps, x, x+eps]
+#        px = [0., 1., 0.]
+
     else:
-        eps = 1e-15 # real eps doesn't work for out purposes
-
-        x = [x-eps, x, x+eps]
-        px = [0., 1., 0.]
-
-    _pdf = _Pdf(x, px, bounds_error=False, fill_value=0.)
+        _pdf = DeltaPdf(x)
 
     return _pdf
 
@@ -111,7 +128,11 @@ def trim_pdf(x, px, min=None, max=None):
 def pdf_from_samples(samples, n=1000, x_min=None, x_max=None, cut=None, 
                      bw=None, return_arrays=False, close=True):
 
-    if np.all(samples == samples[0]):
+    if np.isscalar(samples):
+        x = samples
+        px = 1.
+
+    elif np.all(samples == samples[0]):
         x = samples[0]
         px = 1.
 
