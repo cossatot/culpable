@@ -24,8 +24,9 @@ class _Pdf(interp1d):
     def __init__(self, x, px, bounds_error=False, fill_value=0):
         super(_Pdf, self).__init__(x, px, bounds_error=bounds_error,
                                    fill_value=fill_value)
-        self.cdf = Cdf(x, px)
-        self.icdf = Icdf(x, px)
+
+        self.cdf = Cdf(x, px, normalize=False)
+        self.icdf = Icdf(x, px, normalize=False)
         self.px = self.y
 
     def mode(self):
@@ -34,7 +35,10 @@ class _Pdf(interp1d):
         return (x_max, y_max)
 
     def mean(self):
-        return pdf_mean(self.x, self.y)
+        if self.y[1] == 1.: # if delta fn
+            return self.x[1]
+        else:
+            return pdf_mean(self.x, self.y)
 
     def score_at_percentile(self, pctile):
         """pctile should be a decimal (between 0. and 1.)"""
@@ -48,9 +52,18 @@ class _Pdf(interp1d):
         return self.score_at_percentile(0.5)
 
 
+    def sample(self, n=1):
+        samps = self.icdf(np.random.rand(n))
+        if n == 1:
+            return samps[0]
+        else:
+            return samps
+
+
 class DeltaPdf(object):
     def __init__(self, x):
         self.x = x
+        self.y = 1
 
     def __call__(val):
         if val == self.x:
@@ -61,14 +74,25 @@ class DeltaPdf(object):
     def mean(self):
         return self.x
 
+    def sample(self, n=1):
+        if n == 1:
+            return self.x
+        else:
+            return np.ones(n) * self.x
+
 
 def Pdf(x, px, normalize=True):
     """docstring"""
     if not np.isscalar(x):
         if normalize == True:
             x, px = normalize_pmf(x, px)
-
         _pdf = _Pdf(x, px, bounds_error=False, fill_value=0.)
+    
+#    else:
+#        eps = 1e-15 # real eps doesn't work for out purposes
+#
+#        x = [x-eps, x, x+eps]
+#        px = [0., 1., 0.]
 
     else:
         _pdf = DeltaPdf(x)
@@ -120,10 +144,12 @@ def pdf_from_samples(samples, n=1000, x_min=None, x_max=None, cut=None,
                      bw=None, return_arrays=False, close=True):
 
     if np.isscalar(samples):
-        pdf = Pdf(samples, 1)
+        x = samples
+        px = 1.
 
     elif np.all(samples == samples[0]):
-        pdf = Pdf(samples[0], 1)
+        x = samples[0]
+        px = 1.
 
     else:
         _kde = gaussian_kde(samples, bw_method=bw)
@@ -145,7 +171,7 @@ def pdf_from_samples(samples, n=1000, x_min=None, x_max=None, cut=None,
             px[0] = 0.
             px[-1] = 0.
 
-        pdf = Pdf(x, px)
+    pdf = Pdf(x, px)
 
     if return_arrays == True:
         return pdf.x, pdf.y
