@@ -51,10 +51,18 @@ class _Pdf(interp1d):
     def median(self):
         return self.score_at_percentile(0.5)
 
+    def sample(self, n=1):
+        samps = self.icdf(np.random.rand(n))
+        if n == 1:
+            return samps[0]
+        else:
+            return samps
+
 
 class DeltaPdf(object):
     def __init__(self, x):
         self.x = x
+        self.y = 1
 
     def __call__(val):
         if val == self.x:
@@ -65,6 +73,12 @@ class DeltaPdf(object):
     def mean(self):
         return self.x
 
+    def sample(self, n=1):
+        if n == 1:
+            return self.x
+        else:
+            return np.ones(n) * self.x
+
 
 def Pdf(x, px, normalize=True):
     """docstring"""
@@ -73,12 +87,6 @@ def Pdf(x, px, normalize=True):
             x, px = normalize_pmf(x, px)
         _pdf = _Pdf(x, px, bounds_error=False, fill_value=0.)
     
-#    else:
-#        eps = 1e-15 # real eps doesn't work for out purposes
-#
-#        x = [x-eps, x, x+eps]
-#        px = [0., 1., 0.]
-
     else:
         _pdf = DeltaPdf(x)
 
