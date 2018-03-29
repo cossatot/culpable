@@ -51,7 +51,6 @@ class _Pdf(interp1d):
     def median(self):
         return self.score_at_percentile(0.5)
 
-
     def sample(self, n=1):
         samps = self.icdf(np.random.rand(n))
         if n == 1:
@@ -88,12 +87,6 @@ def Pdf(x, px, normalize=True):
             x, px = normalize_pmf(x, px)
         _pdf = _Pdf(x, px, bounds_error=False, fill_value=0.)
     
-#    else:
-#        eps = 1e-15 # real eps doesn't work for out purposes
-#
-#        x = [x-eps, x, x+eps]
-#        px = [0., 1., 0.]
-
     else:
         _pdf = DeltaPdf(x)
 
