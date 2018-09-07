@@ -58,8 +58,11 @@ def beta_from_dip_rake(dip, rake):
     return degrees( arctan( tan(radians(rake)) * cos(radians(dip))))
 
 
-def apparent_dip_from_dip_rake(rake, dip):
-    return degrees( arctan( tan(radians(rake)) * sin(radians(dip))))
+def apparent_dip_from_dip_rake(dip, rake):
+
+    beta = beta_from_dip_rake(dip, rake)
+
+    return degrees( arctan( tan(radians(dip)) * sin(radians(beta))))
 
 
 def hor_sep_from_vert_sep(vert_sep, dip, rake=90.):
