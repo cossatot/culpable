@@ -6,6 +6,7 @@ _dip_slip = 4.
 _offset = 5.
 _dip = 30.
 _rake = 53.130102354155987
+#_rake = 180 - _rake
 _vert_sep = 2.
 _hor_sep = 2. * np.sqrt(3)
 _heave = np.sqrt(_hor_sep**2 + _strike_slip**2)
@@ -68,7 +69,15 @@ def test_beta_from_rake_dip():
 
 
 def test_apparent_dip_from_dip_rake():
-    pass
+    dips = [81, 79, 30, 30, 30]
+    rakes = [17, 50, 20, 40, 60]
+    ads = [17, 49, 10, 19, 26]
+
+    for i, dip in enumerate(dips):
+        rake = rakes[i]
+        ad_true = ads[i]
+        ad = apparent_dip_from_dip_rake(dip, rake)
+        assert np.abs(ad - ad_true) < 1
 
 
 def test_dip_slip_from_vert_sep():

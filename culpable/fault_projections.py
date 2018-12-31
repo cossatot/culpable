@@ -1,5 +1,5 @@
 import numpy as np
-from numpy import sin, cos, tan, degrees, radians, arctan
+from numpy import sin, cos, tan, degrees, radians, arctan, arcsin
 
 # Slip projections
 ## To/From offset
@@ -58,8 +58,13 @@ def beta_from_dip_rake(dip, rake):
     return degrees( arctan( tan(radians(rake)) * cos(radians(dip))))
 
 
-def apparent_dip_from_dip_rake(rake, dip):
-    return degrees( arctan( tan(radians(rake)) * sin(radians(dip))))
+def apparent_dip_from_dip_rake(dip, rake):
+
+    # alternate functions (use if there are errors)
+    #beta = beta_from_dip_rake(dip, rake)
+    #return degrees( arctan( tan(radians(dip)) * sin(radians(beta)) ))
+
+    return degrees( arcsin( sin(radians(dip)) * sin(radians(rake))))
 
 
 def hor_sep_from_vert_sep(vert_sep, dip, rake=90.):
