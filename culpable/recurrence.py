@@ -8,35 +8,29 @@ from scipy.integrate import trapz, cumtrapz
 import attr
 from attr.validators import instance_of, optional
 
-from .stats import inverse_transform_sample, pdf_from_samples, Pdf, Cdf
+from .stats import inverse_transform_sample, pdf_from_samples, Pdf, Cdf, \
+                   pdf_mean
 
 
 
 # time-dependent EQ stuff
 
-def RecKDE(data):
+def RecKDE(data, data_type='samples'):
+    # TODO: Make it work for more types of PDFs/input data
     return pdf_from_samples(data, x_min=0, close=False)
 
-    
-def pdf(t, rec_pdf):
-    pdf_ = interp1d(rec_pdf.x, rec_pdf.px, kind='linear',
-                    bounds_error=False, fill_value=0.)
-    return pdf_(t)
-
-
-def cdf(t, rec_pdf):
-    cdf_ = interp1d(rec_pdf.x, 
-                    cumtrapz(rec_pdf.px, rec_pdf.x, initial=0.),
-                    kind='linear', bounds_error=False, fill_value=1.)
-    return cdf_(t)
-
-
+ 
 def S(t, rec_pdf):
-    return 1 - cdf(t, rec_pdf)
+    return 1 - rec_pdf.cdf(t)
+
+
+def S_cond(t, c, rec_pdf):
+    return S(c+t, rec_pdf) / S(c, rec_pdf)
 
 
 def hazard(t, rec_pdf):
-    return pdf(t, rec_pdf) / S(t, rec_pdf)
+    #return pdf(t, rec_pdf) / S(t, rec_pdf)
+    return rec_pdf(t) / S(t, rec_pdf)
 
 
 def mean_recurrence_interval(t, rec_pdf):
@@ -50,14 +44,30 @@ def burstiness(rec_ints):
             / (np.std(rec_ints) + np.mean(rec_ints)))
 
 
-def memory(eqs=None, rec_ints=None):
+def memory(rec_ints=None):
     n = len(rec_ints)
     m = rec_ints.mean()
-    v = rec_ints.var()
+    v = rec_ints.var(ddof=1)
 
     return (1 / (n-1)) * np.sum(((rec_ints[i]-m) * (rec_ints[i+1] - m)
                                  for i in range(n-1))) / v
 
+
+def rec_coeff_variation(rec_ints, aggregate=True):
+
+    if aggregate == True:
+        return rec_ints.std(ddof=1) / rec_ints.mean()
+    elif aggregate == False:
+        return rec_ints.std(ddof=1, axis=0) / rec_ints.mean(axis=0)
+    
+
+def mean_remaining_lifetime(t_elapsed, rec_pdf):
+    t_inds = (rec_pdf.x > t_elapsed)
+
+    ts = rec_pdf.x[t_inds]
+    ys = rec_pdf.y[t_inds]
+
+    return pdf_mean(ts, ys)
 
 
 ### Earthquake recurrence PDFs
