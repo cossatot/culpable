@@ -53,18 +53,21 @@ def validate_dist_type(instance, age_dist_type, value):
                                                acceptable_distribution_types))
 
 def validate_dip(instance, attribute, value):
-    if (value < 0.) or (value > 90.):
-        raise ValueError("Only angles between 0 and 90 acceptable")
+    #if (value < 0.) or (value > 90.):
+    #    raise ValueError("Only angles between 0 and 90 acceptable")
+    pass
 
 
 def validate_strike(instance, attribute, value):
-    if (value < 0.) or (value > 360.):
-        raise ValueError("Only angles between 0 and 360 acceptable")
+    #if (value < 0.) or (value > 360.):
+    #    raise ValueError("Only angles between 0 and 360 acceptable")
+    pass
 
 
 def validate_rake(instance, attribute, value):
-    if (value <= -180.) or (value > 360.):
-        raise ValueError("Only angles between 0 and 360 acceptable")
+    #if (value <= -180.) or (value > 360.):
+    #    raise ValueError("Only angles between 0 and 360 acceptable")
+    pass
 
 
 def validate_angle(instance, attribute, value):

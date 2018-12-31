@@ -5,6 +5,9 @@ from scipy.stats import gaussian_kde
 
 # basic pdf stuff
 
+
+eps = np.finfo(float).eps
+
 def normalize_pmf(x, px):
 
     if x[0] > x[1]:
@@ -19,6 +22,22 @@ def normalize_pmf(x, px):
     return x, px_norm
 
 
+def bound_pdf(x, px, normalize=True, bound_distance=eps):
+    if np.isscalar(x):
+        return x, px #for now
+    else:
+        if px[0] != 0.:
+            x = np.insert(x, 0, np.min(x)-bound_distance)
+            px = np.insert(px, 0, 0.)
+        if px[-1] != 0.:
+            x = np.append(x, x[-1]+bound_distance)
+            px = np.append(px, 0.)
+
+    if normalize is True:
+        return normalize_pmf(x, px)
+    else:
+        return x, px
+    
 
 class _Pdf(interp1d):
     def __init__(self, x, px, bounds_error=False, fill_value=0):
@@ -80,11 +99,14 @@ class DeltaPdf(object):
             return np.ones(n) * self.x
 
 
-def Pdf(x, px, normalize=True):
+def Pdf(x, px, normalize=True, bound=True, bound_distance=eps):
     """docstring"""
     if not np.isscalar(x):
         if normalize == True:
             x, px = normalize_pmf(x, px)
+        if bound == True:
+            x, px = bound_pdf(x, px, bound_distance=bound_distance,
+                              normalize=normalize)
         _pdf = _Pdf(x, px, bounds_error=False, fill_value=0.)
     
     else:
