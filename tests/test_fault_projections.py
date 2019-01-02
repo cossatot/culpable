@@ -69,9 +69,9 @@ def test_beta_from_rake_dip():
 
 
 def test_apparent_dip_from_dip_rake():
-    dips = [81, 79, 30, 30, 30]
-    rakes = [17, 50, 20, 40, 60]
-    ads = [17, 49, 10, 19, 26]
+    dips = [81, 81, 79, 79, 30, 30, 30]
+    rakes = [17, 163, 50, 130, 20, 40, 60]
+    ads = [17, 17, 49, 49, 10, 19, 26]
 
     for i, dip in enumerate(dips):
         rake = rakes[i]

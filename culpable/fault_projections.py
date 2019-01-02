@@ -60,10 +60,6 @@ def beta_from_dip_rake(dip, rake):
 
 def apparent_dip_from_dip_rake(dip, rake):
 
-    # alternate functions (use if there are errors)
-    #beta = beta_from_dip_rake(dip, rake)
-    #return degrees( arctan( tan(radians(dip)) * sin(radians(beta)) ))
-
     return degrees( arcsin( sin(radians(dip)) * sin(radians(rake))))
 
 
