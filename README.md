@@ -8,6 +8,25 @@ paleoseismology.
 [![DOI](https://zenodo.org/badge/70557324.svg)](https://zenodo.org/badge/latestdoi/70557324)
 
 
+# Installation
+
+1. Download the package, and enter the outer `culpable` directory
+
+2. create a new Python environment if desired
+
+3. Install with:
+
+    ```python
+    python setup.py install
+    ```
+    
+    or 
+    
+    ```python
+    pip install -e .
+    ```
+
+
 
 ## Earthquake magnitude estimation
 
