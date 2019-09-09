@@ -83,7 +83,7 @@ class DeltaPdf(object):
         self.x = x
         self.y = 1
 
-    def __call__(val):
+    def __call__(self, val):
         if val == self.x:
            return 1.
         else:
@@ -227,8 +227,10 @@ def divide_pdfs(p1, p2, step=None, n_interp=1000):
     else:
         x = np.arange(x_min, x_max+step, step)
         
-    
-    px = p1(x) / p2(x)
+    px = np.zeros(x.shape)
+    p2_nonzero = [p2(x) != 0.]
+
+    px[p2_nonzero] = p1(x)[p2_nonzero] / p2(x)[p2_nonzero]
 
     return Pdf(x, px)
 

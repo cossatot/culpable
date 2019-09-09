@@ -1,6 +1,6 @@
 import numpy as np
 
-from .stats import Pdf, pdf_from_samples, multiply_pdfs
+from .stats import Pdf, pdf_from_samples, multiply_pdfs, divide_pdfs
 
 """
 Scaling relationships and related equations for earthquake magnitude
@@ -167,7 +167,6 @@ M_from_L_coeffs = {'Stirling_2002_instr': {'a': 5.45,
 
 
 
-
 def M_from_D(D, ref='BW_2006', a=None, b=None, base='e'):
     """
     Moment magnitude from displacement, using the specified scaling
@@ -202,7 +201,7 @@ def M_from_D(D, ref='BW_2006', a=None, b=None, base='e'):
     """
 
     if ref is not None:
-
+        # consider warning if ref is not None and a, b, log are inputs
         a = M_from_D_coeffs[ref]['a']
         b = M_from_D_coeffs[ref]['b']
         base = M_from_D_coeffs[ref]['log_base']
@@ -289,7 +288,7 @@ def M_from_L(L, ref='Stirling_2002_instr', unit='km', a=None, b=None, base='e',
         '10' is log10.
 
     mc : Boolean that indicates whether to sample the coefficents a and b
-         including uncertainties a_err and b_err through Monte Carlo
+         including uncertainties `a_err` and `b_err` through Monte Carlo
          techniques.
 
 
@@ -313,7 +312,6 @@ def M_from_L(L, ref='Stirling_2002_instr', unit='km', a=None, b=None, base='e',
         except KeyError:
             pass
 
-
     if mc == True:
         A = a if a_err is None else np.random.normal(a, a_err, len(L))
         B = b if b_err is None else np.random.normal(b, b_err, len(L))
@@ -323,7 +321,6 @@ def M_from_L(L, ref='Stirling_2002_instr', unit='km', a=None, b=None, base='e',
         B = b
 
     return A + B * log_fn[base](L)
-
 
 
 """
@@ -382,10 +379,9 @@ def p_D_M(D, M, ref='BW_2006', sample_bias_corr=False):
     return p_D_M
 
 
-
-def make_p_M_x(p_M_min=5., p_M_max=8.5, M_step=0.1, n_M=None):
+def _make_p_M_x(p_M_min=5., p_M_max=8.5, M_step=0.1, n_M=None):
     """
-    dox
+    Makes the X values (i.e., the magnitudes) for a p_M distribution.
     """
     
     if n_M is not None:
@@ -416,8 +412,8 @@ def make_p_M_uniform(p_M_min=5., p_M_max=8.5, M_step=0.1, n_M=None):
     p_M : Pdf function with a uniform distribution between p_M_min and p_M_max
 
     """
-    p_M_x = make_p_M_x(p_M_min=p_M_min, p_M_max=p_M_max, M_step=M_step, 
-                       n_M=n_M)
+    p_M_x = _make_p_M_x(p_M_min=p_M_min, p_M_max=p_M_max, M_step=M_step, 
+                        n_M=n_M)
 
     return Pdf(p_M_x, np.ones(len(p_M_x)) * 1 / len(p_M_x))
 
@@ -434,15 +430,15 @@ def make_p_M_gr_surface_break(p_M_min=5., p_M_max=8.5, M_step=0.1, n_M=None):
     p_M : Pdf class with a modified Gutenberg-Richter distribution.
 
     """
-    p_M_x = make_p_M_x(p_M_min=p_M_min, p_M_max=p_M_max, M_step=M_step, 
-                       n_M=n_M)
+    p_M_x = _make_p_M_x(p_M_min=p_M_min, p_M_max=p_M_max, M_step=M_step, 
+                        n_M=n_M)
 
     p_M_gr_sb = Pdf(gr_pm_x, gr_pm_y)
 
     p_M_gr_sb_y = p_M_gr_sb(p_M_x)
 
     return Pdf(p_M_x, p_M_gr_sb_y)
-   
+
 
 def make_p_M(p_M_type='uniform', p_M_min=None, p_M_max=None, M_step=None, 
              n_M=None):
@@ -457,8 +453,11 @@ def make_p_M(p_M_type='uniform', p_M_min=None, p_M_max=None, M_step=None,
                breaking the surface, as reported in BW 2006).
 
     p_M_min : Minimum magnitude.
+
     p_M_max : Maximum magnitude.
+
     M_step : Width of steps in interpolation (no effect on final results).
+
     n_M : number of points in interpolation (no effect on final results).
 
     Returns
@@ -503,14 +502,14 @@ def p_M_D(D, p_M=None, p_M_min=None, p_M_max=None, M_step=None, n_M=None,
                breaking the surface, as reported in BW 2006).
 
     p_M_min : Minimum prior magnitude; only needed if `p_M` is not given.
-    p_M_min : Minimum prior magnitude; only needed if `p_M` is not given.
+    p_M_max : Maximum prior magnitude; only needed if `p_M` is not given.
     M_step : Spacing for `p_M`; only needed if `p_M` is not given.
     n_M :  number of points for `p_M`; only needed if `p_M` is not given.
 
     ref : Reference for magnitude-displacement scaling relationships. See
           `M_from_D` for a list of implemented relationships.
 
-    sample_bias_coorection: Boolean indicating whether to correct for
+    sample_bias_correction: Boolean indicating whether to correct for
                             preferential sampling of scarps proportionally
                             to the offset at a point relative to the min
                             and max offsets.
@@ -528,14 +527,13 @@ def p_M_D(D, p_M=None, p_M_min=None, p_M_max=None, M_step=None, n_M=None,
         #TODO: maybe add some logic for dealing with non `Pdf` priors
         pass
 
-    p_D = np.array([np.trapz(Dn_y, Dn_x * D_from_M(M, ref=ref))
-                    for M in p_M.x])
+    p_D = Pdf(p_M.x, [np.trapz(Dn_y, Dn_x * D_from_M(M, ref=ref))
+                      for M in p_M.x])
 
     p_D_M_ = p_D_M(D, p_M.x, ref=ref, sample_bias_corr=sample_bias_corr)
 
-    p_M_D_ = p_M.y * p_D_M_.y / p_D
-
-    p_M_D_ = Pdf(p_M.x, p_M_D_)
+    p_M_D_ = multiply_pdfs(p_M, p_D_M_, step=M_step)
+    p_M_D_ = divide_pdfs(p_M_D_, p_D, step=M_step)
 
     return p_M_D_
 
@@ -563,7 +561,7 @@ def p_M_L(L, p_M=None, p_M_min=None, p_M_max=None, M_step=None, n_M=None,
                breaking the surface, as reported in BW 2006).
 
     p_M_min : Minimum prior magnitude; only needed if `p_M` is not given.
-    p_M_min : Minimum prior magnitude; only needed if `p_M` is not given.
+    p_M_max : Maximum prior magnitude; only needed if `p_M` is not given.
     M_step : Spacing for `p_M`; only needed if `p_M` is not given.
     n_M :  number of points for `p_M`; only needed if `p_M` is not given.
 
@@ -634,7 +632,7 @@ def p_M_DL(D, L, p_M=None, p_M_min=None, p_M_max=None, M_step=None, n_M=None,
          errors) in the scaling relationship to the posterior using a Monte
          Carlo simulation.
 
-    sample_bias_coorection: Boolean indicating whether to correct for
+    sample_bias_correction: Boolean indicating whether to correct for
                             preferential sampling of scarps proportionally
                             to the offset at a point relative to the min
                             and max offsets.
@@ -650,8 +648,6 @@ def p_M_DL(D, L, p_M=None, p_M_min=None, p_M_max=None, M_step=None, n_M=None,
                        M_step=M_step, n_M=n_M)
 
     p_M_D_ = p_M_D(D, p_M, ref=D_ref, sample_bias_corr=sample_bias_corr)
-
-    
 
     p_M_L_samples = M_from_L(L, ref=L_ref, mc=L_mc)
 

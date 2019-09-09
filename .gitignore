@@ -1,2 +1,6 @@
 *.pyc
 __pycache__
+.DS_Store
+
+culpable.egg-info
+.vscode
